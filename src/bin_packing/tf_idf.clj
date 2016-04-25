@@ -39,6 +39,11 @@
     (map #(merge-with * % (select-keys idf (keys %)))
          tfs)))
 
+(defn tf-idf-pairs [id-doc-pairs]
+  (map (fn [[id _] tf-idf] [id tf-idf])
+       id-doc-pairs
+       (tf-idf (map second id-doc-pairs))))
+
 (defn calc-scores [id-doc-pairs]
   )
 
