@@ -117,12 +117,13 @@
 (defn get-ebook-text [url]
   (with-open [rdr (io/reader url)]
     (apply str
-           (doall (->> (line-seq rdr)
-                       (drop-while #(not-any? (partial string/starts-with? %)
-                                              text-start-markers))
-                       rest
-                       (take-while #(not-any? (partial string/starts-with? %)
-                                              text-end-markers)))))))
+           (interpose " "
+                      (doall (->> (line-seq rdr)
+                                  (drop-while #(not-any? (partial string/starts-with? %)
+                                                         text-start-markers))
+                                  rest
+                                  (take-while #(not-any? (partial string/starts-with? %)
+                                                         text-end-markers))))))))
 
 (defn get-ebook-texts [ebooks-urls]
   (update ebooks-urls :ebooks
