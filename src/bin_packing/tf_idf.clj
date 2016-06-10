@@ -1,10 +1,8 @@
 (ns bin-packing.tf-idf
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [bin-packing.spark-utils :as su]))
 
-(defn map-vals [f m]
-  (into {} (for [[k v] m] [k (f v)])))
-
-(def stop-words #{"a" "all" "and" "any" "are" "is" "in" "of" "on"
+(def stop-words #{"" "a" "all" "and" "any" "are" "is" "in" "of" "on"
                   "or" "our" "so" "this" "the" "that" "to" "we"})
 
 (defn split-words [s]
@@ -23,26 +21,31 @@
 (defn tf [doc]
   (let [terms   (get-terms doc)
         n-terms (count terms)]
-    (map-vals (partial calc-tf n-terms) (frequencies terms))))
+    (su/map-vals (partial calc-tf n-terms) (frequencies terms))))
 
 (defn term-doc-counts [tfs]
-  (->> (mapcat keys tfs)
-       (group-by identity)
-       (map-vals count)))
+  (->> (su/mapcat keys tfs)
+       (su/group-by identity)
+       (su/map-vals count)))
 
 (defn idf [n-docs term-doc-counts]
-  (map-vals (partial calc-idf n-docs) term-doc-counts))
+  (su/map-vals (partial calc-idf n-docs) term-doc-counts))
 
-(defn tf-idf [docs]
-  (let [tfs (map tf docs)
-        idf (idf (count docs) (term-doc-counts tfs))]
-    (map #(merge-with * % (select-keys idf (keys %)))
-         tfs)))
+(defn calc-tf-and-idf [id-doc-pairs]
+  (let [tfs-with-ids (su/cache (su/map-vals tf id-doc-pairs))
+        tfs (su/map (fn [[k v]] v) tfs-with-ids)]
+    {:tfs tfs-with-ids
+     :idf (su/to-map (idf (su/count id-doc-pairs)
+                          (term-doc-counts tfs)))}))
 
-(defn tf-idf-pairs [id-doc-pairs]
-  (map (fn [[id _] tf-idf] [id tf-idf])
-       id-doc-pairs
-       (tf-idf (map second id-doc-pairs))))
+(defn calc-tf-idf [{:keys [tfs idf]}]
+  (su/map-vals #(merge-with * % (select-keys idf (keys %)))
+               tfs))
+
+(defn tf-idf [id-doc-pairs]
+  (-> id-doc-pairs
+      calc-tf-and-idf
+      calc-tf-idf))
 
 (defn calc-scores [id-doc-pairs]
   )
