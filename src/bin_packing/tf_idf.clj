@@ -18,25 +18,25 @@
 (defn calc-idf [n-docs term-n-docs]
   (Math/log (/ n-docs (+ 1.0 term-n-docs))))
 
-(defn tf [doc]
-  (let [terms   (get-terms doc)
-        n-terms (count terms)]
+(defn tf [terms]
+  (let [n-terms (count terms)]
+    (println (str "DEBUG: Calculating tf for " n-terms " terms ..."))
     (su/map-vals (partial calc-tf n-terms) (frequencies terms))))
 
-(defn term-doc-counts [tfs]
-  (->> (su/mapcat keys tfs)
+(defn term-doc-counts [id-and-terms]
+  (->> (su/mapcat (fn [[k v]] v) id-and-terms)
        (su/group-by identity)
        (su/map-vals count)))
 
 (defn idf [n-docs term-doc-counts]
+  (println (str "DEBUG: Calculating idf for " n-docs " docs ..."))
   (su/map-vals (partial calc-idf n-docs) term-doc-counts))
 
 (defn calc-tf-and-idf [id-doc-pairs]
-  (let [tfs-with-ids (su/cache (su/map-vals tf id-doc-pairs))
-        tfs (su/map (fn [[k v]] v) tfs-with-ids)]
-    {:tfs tfs-with-ids
+  (let [id-and-terms (su/cache (su/map-vals get-terms id-doc-pairs))]
+    {:tfs (su/map-vals tf id-and-terms)
      :idf (su/to-map (idf (su/count id-doc-pairs)
-                          (term-doc-counts tfs)))}))
+                          (term-doc-counts id-and-terms)))}))
 
 (defn calc-tf-idf [{:keys [tfs idf]}]
   (su/map-vals #(merge-with * % (select-keys idf (keys %)))
