@@ -127,7 +127,9 @@
 
 (defn get-ebook-texts [ebooks-urls]
   (update ebooks-urls :ebooks
-          #(map (fn [[id url]] [id (get-ebook-text url)]) %)))
+          #(map (fn [[id url]]
+                  (println (str "DEBUG: Getting text of " id ", " url " ..."))
+                  [id (get-ebook-text url)]) %)))
 
 
 (def book-shelf-headers {"User-Agent"
@@ -137,15 +139,22 @@
 (def bookshelf-url-1 (io/as-url (str gutenberg-base-url "/wiki/Category:Bookshelf")))
 (def bookshelf-url-2 (io/as-url (str gutenberg-base-url "/w/index.php?title=Category:Bookshelf&pagefrom=The+Girls+Own+Paper+%28Bookshelf%29#mw-pages")))
 
+(defn get-a-elements [url-path]
+  (-> url-path
+      io/as-url
+      (html/html-resource {:insecure? true})
+      (html/select [:a])))
+
 (defn get-attr [url-path attr]
-  (map #(get-in % [:attrs attr])
-       (-> url-path
-           io/as-url
-           html/html-resource
-           (html/select [:a]))))
+  (map #(get-in % [:attrs attr]) (get-a-elements url-path)))
 
 (defn get-hrefs [url-path] (get-attr url-path :href))
 (defn get-titles [url-path] (get-attr url-path :title))
+
+
+(defn get-titles-and-content [url-path]
+  (map (fn [e] [(-> e :attrs :title) (-> e :content first)])
+       (get-a-elements url-path)))
 
 (def non-bookself-hrefs
   #{"/wiki/Category:DE_B%C3%BCcherregal"
@@ -170,6 +179,15 @@
        (remove non-bookself-hrefs)
        (filter #(re-find #"^/wiki/.+\(Bookshelf\)" %))))
 
+(defn get-ebook-ids-and-titles [bookshelf-url]
+  (->> bookshelf-url
+       get-titles-and-content
+       (filter (fn [[t c]] (and t c)))
+       (map (fn [[t c]] [(re-find #"ebook:(\d+)" t) c]))
+       (filter (comp first identity))
+       (map (fn [[t c]] [(last t) c]))
+       (map (fn [[id c]] [(Integer/parseInt id) c]))))
+
 (defn get-ebook-ids [bookshelf-url]
   (->> bookshelf-url
        get-titles
@@ -188,6 +206,11 @@
 (def get-category-urls (partial get-urls get-categories))
 (def get-bookshelf-urls (partial get-urls get-bookshelves))
 
+(defn get-bookshelf-ebook-ids-and-titles [urls]
+  (->> (for [url urls]
+         [url (get-ebook-ids-and-titles url)])
+       (filter #(seq (second %)))))
+
 (defn get-bookshelf-ebook-ids [urls]
   (->> (for [url urls]
          [url (get-ebook-ids url)])
@@ -196,6 +219,10 @@
 (defn get-all-bookshelf-urls! []
   (concat (get-bookshelf-urls gutenberg-base-url bookshelf-url-1)
           (get-bookshelf-urls gutenberg-base-url bookshelf-url-2)))
+
+(defn get-bookself-ids-and-titles! []
+  (-> (get-all-bookshelf-urls!)
+      get-bookshelf-ebook-ids-and-titles))
 
 (defn get-bookself-ids! []
   (-> (get-all-bookshelf-urls!)
