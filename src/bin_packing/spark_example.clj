@@ -6,7 +6,8 @@
             [clojure.java.io :as io]
             [bin-packing.gutenberg :as gutenberg]
             [bin-packing.tf-idf :as tf-idf]
-            [bin-packing.spark-utils :as su])
+            [bin-packing.spark-utils :as su]
+            [bin-packing.core :as bin-packing])
   (:import [org.apache.spark Partitioner])
   (:gen-class))
 
@@ -27,6 +28,7 @@
 
 (defn partitioner-fn [n-partitions partition-fn]
   (proxy [Partitioner] []
+    ;; get partition index
     (getPartition [key] (partition-fn key))
     (numPartitions [] n-partitions)))
 
@@ -55,43 +57,59 @@
   (println "DEBUG: Calculating bookshelfs tf-idf ...")
   (tf-idf/tf-idf (bookshelf-combined-texts bookshelf-texts)))
 
-(defn run-analysis [sc]
-  (let [_ (println "*** GETTING BOOK IDS")
-        ;; bookshelfs-ids (gutenberg/get-bookself-ids-and-titles!)
-        ;; [[bookshelf-url [ebook-id]]]
-        _ (println "*** CREATING IDS RDD")
-        ;; ebook-ids-rdd  (spark/parallelize sc bookshelfs-ids)
-        ebook-ids-rdd (->> "s3://silverpond/bin-packing-example/bs_ids_and_titles.txt"
-                           (spark/text-file sc)
-                           (spark/map read-string)
-                           (spark/repartition 80))
-        _ (println "*** GETTING URLS")
-        ebook-urls     (bookshelf-ebooks ebook-ids-rdd)
-        ;; [#tuple[bookshelf-url {:ebooks [[ebook-id ebook-url]] :size total-ebook-size}]]
+(defn get-ebook-urls [sc & {:keys [ebook-urls-path]}]
+  (if ebook-urls-path
+    (->> ebook-urls-path
+         (spark/text-file sc)
+         (spark/map-to-pair #(apply spark/tuple (clojure.edn/read-string %)))
+         (spark/repartition 100))
+    (let [_ (println "*** GETTING BOOK IDS")
+          bookshelfs-ids (gutenberg/get-bookself-ids-and-titles!)
+          ;; [[bookshelf-url [ebook-id]]]
+          _ (println "*** CREATING IDS RDD")
+          ebook-ids-rdd  (spark/parallelize sc bookshelfs-ids)]
+      (println "*** GETTING URLS")
+      ;; [#tuple[bookshelf-url {:ebooks [[ebook-id ebook-url]] :size total-ebook-size}]]
+      (bookshelf-ebooks ebook-ids-rdd))))
+
+(defn partition-into-bins [ebook-urls]
+  (let [ebook-urls     (spark/cache ebook-urls)
+        packing-items  (spark/collect (su/map (fn [[k v]] [k (:size v)]) ebook-urls))
+        item-indices   (-> packing-items bin-packing/pack bin-packing/item-indices)
+        ebook-urls     (spark/partition-by
+                        (partitioner-fn (:bin-count item-indices)
+                                        (:item-indices item-indices))
+                        ebook-urls)]
+    ebook-urls))
+
+(defn run-analysis [sc & {:keys [pack]}]
+  (let [ebook-urls   (get-ebook-urls
+                      sc
+                      :ebook-urls-path "s3://silverpond/bin-packing-example/ebook_urls.txt")
+        ebook-urls   (if pack (partition-into-bins ebook-urls) ebook-urls)
+
         _ (println "*** GETTING TEXTS")
-        bs-texts       (spark/cache (spark/map-values gutenberg/get-ebook-texts
-                                                      ebook-urls))
+        bs-texts     (spark/map-values gutenberg/get-ebook-texts ebook-urls)
         ;; [#tuple[bookshelf-url {:ebooks [[ebook-id text]] :size total-ebook-size}]]
         _ (println "*** RUNNING TF-IDF ON TEXTS")
-        books-tf-idf   (ebooks-tf-idf bs-texts)
+        books-tf-idf (spark/map-values (partial into [])
+                                       (ebooks-tf-idf bs-texts))
         ;; [#tuple[bookshelf-url [[ebook-id tf-idf]]]]
-        _ (println "*** RUNNING TF-IDF ON BOOKSHELF")
-        bs-tf-idf      (bookshelfs-tf-idf bs-texts)]
-    ;; [#tuple[bookshelf-url tf-idf]]
-
-    {:books-tf-idf books-tf-idf
-     :bookshelf-tf-idf bs-tf-idf}))
+        ]
+    {:books-tf-idf books-tf-idf}))
 
 
 (defn -main [& args]
   (println "*** CREATING SPARK CONTEXT")
   (let [sc (make-spark-context)
         {:keys [books-tf-idf
-                bookshelf-tf-idf]} (run-analysis sc)]
-    (spark/save-as-text-file "s3://silverpond/bin-packing-example/output/books_tf_idf.txt"
+                bookshelf-tf-idf]} (run-analysis sc :pack true)]
+    (spark/save-as-text-file (str "s3://silverpond/bin-packing-example/output/"
+                                  (first args)) ;books_tf_idf_packed.txt
                              books-tf-idf)
-    (spark/save-as-text-file "s3://silverpond/bin-packing-example/output/bookshelf_tf_idf.txt"
-                             bookshelf-tf-idf)))
+    ;(spark/save-as-text-file "s3://silverpond/bin-packing-example/output/bookshelf_tf_idf.txt"
+    ;                         bookshelf-tf-idf)
+    ))
 
 ;; (set! *print-length* 3)
 ;; (set! *print-level* 6)
