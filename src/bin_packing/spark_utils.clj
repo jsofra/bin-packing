@@ -1,6 +1,7 @@
 (ns bin-packing.spark-utils
   (:require [sparkling.core :as spark]
-            [sparkling.destructuring :as de])
+            [sparkling.destructuring :as de]
+            [sparkling.broadcast :as sb])
   (:import org.apache.spark.api.java.JavaRDD
            org.apache.spark.api.java.JavaPairRDD)
   (:refer-clojure :exclude [map count group-by mapcat
@@ -81,3 +82,11 @@
 (defn count [coll] (xcount coll))
 (defn get [coll k d] (xget coll k d))
 (defn cache [coll] (xcache coll))
+
+(defn broadcast [val & {:keys [sc]}]
+  (if sc
+    (sb/broadcast sc val)
+    (atom val)))
+
+(defn log [& msgs]
+  (apply println (java.util.Date.) "DEBUG:" msgs))
