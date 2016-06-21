@@ -22,6 +22,22 @@
                  (conj bins (add-to-bin empty-bin item))))
              init-bins items))))
 
+(defn pack-n-bins-ish [items n]
+  (let [max-size (/ (reduce + (map second items)) (dec n))]
+    (pack items max-size)))
+
+(defn pack-n-bins
+  ([items n] (pack-n-bins items n (second (first items))))
+  ([items n max-size]
+   (let [p-items (partition n n (repeat nil) items)
+         bin-slices (map-indexed (fn [idx i] (if (even? idx) i (reverse i)))
+                                 p-items)]
+     (apply map (fn [& items]
+                  (let [items (filter identity items)]
+                    {:size (reduce + (map second items))
+                     :items items}))
+            bin-slices))))
+
 (defn item-indices [bins]
   {:bin-count (count bins)
    :item-indices (into {}
