@@ -82,7 +82,7 @@
   (let [ebook-urls     (spark/cache ebook-urls)
         packing-items  (spark/collect (su/map (fn [[k v]] [k (weight-fn v)]) ebook-urls))
         item-indices   (-> (sort-by second > packing-items)
-                           (bin-packing/pack-n-bins-ish 16)
+                           (bin-packing/pack-n-bins 16)
                            bin-packing/item-indices)
         ebook-urls     (spark/partition-by
                         (partitioner-fn (:bin-count item-indices)
@@ -94,23 +94,25 @@
   (let [ebook-urls   (get-ebook-urls
                       sc
                       :ebook-urls-path ebook-urls-path)
-        ebook-urls   (case mode
+        [part-mode proc-mode] (string/split mode #"_")
+        ebook-urls   (case part-mode
                        "pack" (partition-into-bins ebook-urls book-size-and-count-weight-fn)
                        "partition" (spark/repartition 228 ebook-urls)
                        "skew" ebook-urls)
         _ (su/log "*** GETTING TEXTS")
         bs-texts     (spark/map-values gutenberg/get-ebook-texts ebook-urls)
+        bs-texts     (if (= proc-mode "full") (spark/cache bs-texts) bs-texts)
         ;; [#tuple[bookshelf-url {:ebooks [[ebook-id text]] :size total-ebook-size}]]
         _ (su/log "*** RUNNING TF-IDF ON TEXTS")
         books-tf-idf (spark/map-values (partial into [])
                                        (ebooks-tf-idf bs-texts))
         ;; [#tuple[bookshelf-url [[ebook-id tf-idf]]]]
-        ;; bs-tf-idf    (bookshelfs-tf-idf bs-texts)
+        bs-tf-idf    (if (= proc-mode "full")
+                       (bookshelfs-tf-idf bs-texts))
         ;; [#tuple[bookshelf-url tf-idf]]
         ]
     {:books-tf-idf books-tf-idf
-     ;:bookshelf-tf-idf bs-tf-idf
-     }))
+     :bookshelf-tf-idf bs-tf-idf}))
 
 
 (defn -main [& [ebook-urls-path output-file mode]]
@@ -123,7 +125,10 @@
     (spark/save-as-text-file (str "s3://silverpond/bin-packing-example/output/"
                                   output-file) ;books_tf_idf_packed.txt
                              books-tf-idf)
-    ;; (spark/save-as-text-file "s3://silverpond/bin-packing-example/output/bookshelf_tf_idf.txt" bookshelf-tf-idf)
+    (when bookshelf-tf-idf
+      (spark/save-as-text-file (str "s3://silverpond/bin-packing-example/output/bookself_"
+                                    output-file)
+                               bookshelf-tf-idf))
     ))
 
 ;; (set! *print-length* 16)
