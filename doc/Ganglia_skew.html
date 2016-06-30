@@ -1,0 +1,735 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!-- saved from url=(0069)http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/ -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Ganglia:: j-1MM0DOB1TUSN2 Cluster Report</title>
+
+<link type="text/css" href="./Ganglia_skew_files/jquery-ui-1.10.2.custom.min.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/jquery.liveSearch.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/jquery.multiselect.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/jquery.flot.events.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/fullcalendar.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/qtip.min.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/chosen.min.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/styles.css" rel="stylesheet">
+<link type="text/css" href="./Ganglia_skew_files/style.min.css" rel="stylesheet">
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.min.js"></script>
+<script>$.uiBackCompat = false;</script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery-ui.min.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.livesearch.min.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/ganglia.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.gangZoom.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.cookie.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.ba-bbq.min.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/combobox.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.scrollTo-1.4.3.1-min.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.buttonsetv.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/fullcalendar.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jquery.qtip.min.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/jstree.js"></script>
+<script type="text/javascript" src="./Ganglia_skew_files/chosen.jquery.min.js"></script>
+<script type="text/javascript">
+    var server_utc_offset=0;
+    var g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+
+    function refreshHeader() {
+      $.get('header.php?date_only=1', function(datetime) {
+        var title = $("#page_title").text();
+        var l = title.lastIndexOf(" at ");
+        if (l != -1)
+          title = title.substring(0, l);
+        title += " at " + datetime;
+        $("#page_title").text(title);
+        });
+    }
+
+    function refresh() {
+      var selected_tab = $("#selected_tab").val();
+      if (selected_tab == "agg") {
+        refreshAggregateGraph();
+        g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+      } else if (selected_tab == "v") {
+        refreshHeader();
+        if ($.isFunction(window.refreshView)) {
+          refreshView();
+          g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+        } else if ($.isFunction(window.refreshDecomposeGraph)) {
+          refreshDecomposeGraph();
+          g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+        } else
+          ganglia_form.submit();
+      } else if (selected_tab == "ev") {
+        refreshOverlayEvent();
+        g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+      } else if (selected_tab == "m") {
+        if ($.isFunction(window.refreshClusterView)) {
+          refreshHeader();
+          refreshClusterView();
+          g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+        } else if ($.isFunction(window.refreshHostView)) {
+          refreshHeader();
+          refreshHostView();
+          g_refresh_timer = setTimeout("refresh()", 300 * 1000);
+        } else
+          ganglia_form.submit();
+      } else
+        ganglia_form.submit();
+    }
+
+    $(function() {
+      var range_menu = $("#range_menu");
+      if (range_menu[0])
+        range_menu.buttonset();
+
+      var custom_range_menu = $("#custom_range_menu");
+      if (custom_range_menu[0])
+        custom_range_menu.buttonset();
+
+      var sort_menu = $("#sort_menu");
+      if (sort_menu[0])
+        sort_menu.buttonset();
+
+      g_overlay_events = ($("#overlay_events").val() == "true");
+
+      g_tabIndex = new Object();
+      g_tabName = [];
+      var tabName = ["m", "s", "v", "agg", "ch", "ev", "rot", "mob"];
+      var j = 0;
+      for (var i in tabName) {
+        if (tabName[i] == "ev" && !g_overlay_events)
+          continue;
+        g_tabIndex[tabName[i]] = j++;
+        g_tabName.push(tabName[i]);
+      }
+
+      // Follow tab's URL instead of loading its content via ajax
+      var tabs = $("#tabs");
+      if (tabs[0]) {
+        tabs.tabs();
+        // Restore previously selected tab
+        var selected_tab = $("#selected_tab").val();
+        //alert("selected_tab = " + selected_tab);
+        if (typeof g_tabIndex[selected_tab] != 'undefined') {
+          try {
+            //alert("Selecting tab: " + selected_tab);
+            tabs.tabs('option', 'active', g_tabIndex[selected_tab]);
+            if (selected_tab == "rot")
+              autoRotationChooser();
+          } catch (err) {
+            try {
+              alert("Error(ganglia.js): Unable to select tab: " + 
+                    selected_tab + ". " + err.getDescription());
+            } catch (err) {
+              // If we can't even show the error, fail silently.
+            }
+          }
+        }
+        tabs.tabs({
+          beforeActivate: 
+          function(event, ui) {
+            var tabIndex = ui.newTab.index();
+            $("#selected_tab").val(g_tabName[tabIndex]);
+            if (g_tabName[tabIndex] != "mob")
+              $.cookie("ganglia-selected-tab-" + window.name, tabIndex);
+            if (tabIndex == g_tabIndex["m"] ||
+              tabIndex == g_tabIndex["v"] ||
+              tabIndex == g_tabIndex["ch"])
+              ganglia_form.submit();
+          }
+        });
+      }
+    });
+
+  $(function () {
+    $("#metrics-picker").val("load_one");
+    $(".header_btn").button();
+
+    done = function done(startTime, endTime) {
+            setStartAndEnd(startTime, endTime);
+            document.forms['ganglia_form'].submit();
+    }
+
+    cancel = function (startTime, endTime) {
+            setStartAndEnd(startTime, endTime);
+    }
+
+    defaults = {
+        startTime: 1467248496,
+        endTime: 1467252096,
+        done: done,
+        cancel: cancel
+    }
+
+    $(".host_small_zoomable").gangZoom($.extend({
+        paddingLeft: 67,
+        paddingRight: 30,
+        paddingTop: 38,
+        paddingBottom: 25
+    }, defaults));
+
+    $(".host_medium_zoomable").gangZoom($.extend({
+        paddingLeft: 67,
+        paddingRight: 30,
+        paddingTop: 38,
+        paddingBottom: 40
+    }, defaults));
+
+    $(".host_default_zoomable").gangZoom($.extend({
+        paddingLeft: 66,
+        paddingRight: 30,
+        paddingTop: 37,
+        paddingBottom: 50
+    }, defaults));
+
+    $(".host_large_zoomable").gangZoom($.extend({
+        paddingLeft: 66,
+        paddingRight: 29,
+        paddingTop: 37,
+        paddingBottom: 56
+    }, defaults));
+
+    $(".cluster_zoomable").gangZoom($.extend({
+        paddingLeft: 67,
+        paddingRight: 30,
+        paddingTop: 37,
+        paddingBottom: 50
+    }, defaults));
+
+    function rrdDateTimeString(date) {
+      return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear() + " " + date.getHours() + ":" + date.getMinutes();
+    }
+
+    function setStartAndEnd(startTime, endTime) {
+        // we're getting local start/end times.
+
+        // getTimezoneOffset returns negative values east of UTC,
+        // which is the opposite of PHP. we want negative values to the west.
+        var local_offset = new Date().getTimezoneOffset() * 60 * -1;
+        var delta = local_offset - server_utc_offset;
+        var date = new Date((Math.floor(startTime) - delta) * 1000);
+        $("#datepicker-cs").val(rrdDateTimeString(date));
+        date = new Date((Math.floor(endTime) - delta) * 1000);
+        $("#datepicker-ce").val(rrdDateTimeString(date));
+    }
+
+    initShowEvent();
+    initTimeShift();
+  });
+
+
+</script>
+
+<style type="text/css">#gangZoomFloater {border: 1px solid black;background: white;opacity: 0.7;position: absolute;top: 0;height: 100%;</style></head>
+<body style="background-color: #ffffff;" onunload="g_refresh_timer=null">
+
+
+
+
+<div id="tabs" class="ui-tabs ui-widget ui-widget-content ui-corner-all">
+  <div id="tabs-menu" ,="">
+    <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all" role="tablist">
+      <li class="ui-state-default ui-corner-top ui-tabs-active ui-state-active" role="tab" tabindex="0" aria-controls="tabs-main" aria-labelledby="ui-id-1" aria-selected="true"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-main" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-1">Main</a></li>
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-search" aria-labelledby="ui-id-2" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-search" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-2">Search</a></li>
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-main" aria-labelledby="ui-id-3" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-main" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-3">Views</a></li>
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="ui-tabs-1" aria-labelledby="ui-id-4" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/aggregate_graphs.php" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-4">Aggregate Graphs</a></li>
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-main" aria-labelledby="ui-id-5" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-main" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-5">Compare Hosts</a></li>
+            <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="ui-tabs-2" aria-labelledby="ui-id-6" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/events.php" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-6">Events</a></li>
+      
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="ui-tabs-3" aria-labelledby="ui-id-7" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/breakdown_reports.php" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-7">Reports</a></li>
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-autorotation" aria-labelledby="ui-id-8" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-autorotation" onclick="autoRotationChooser();" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-8">Automatic Rotation</a></li>
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-livedashboard" aria-labelledby="ui-id-9" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-livedashboard" onclick="liveDashboardChooser();" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-9">Live Dashboard</a></li>
+            <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="ui-tabs-4" aria-labelledby="ui-id-10" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/cubism_form.php" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-10">Cubism</a></li>
+      
+      <li class="ui-state-default ui-corner-top" role="tab" tabindex="-1" aria-controls="tabs-mobile" aria-labelledby="ui-id-11" aria-selected="false"><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/#tabs-mobile" onclick="window.location.href=&#39;mobile.php&#39;;" class="ui-tabs-anchor" role="presentation" tabindex="-1" id="ui-id-11">Mobile</a></li>
+    </ul><div id="ui-tabs-4" class="ui-tabs-panel ui-widget-content ui-corner-bottom" aria-live="polite" aria-labelledby="ui-id-10" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;"></div><div id="ui-tabs-3" class="ui-tabs-panel ui-widget-content ui-corner-bottom" aria-live="polite" aria-labelledby="ui-id-7" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;"></div><div id="ui-tabs-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" aria-live="polite" aria-labelledby="ui-id-6" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;"></div><div id="ui-tabs-1" class="ui-tabs-panel ui-widget-content ui-corner-bottom" aria-live="polite" aria-labelledby="ui-id-4" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;"></div>
+  </div>
+
+<div id="tabs-main" aria-labelledby="ui-id-5" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="true" aria-hidden="false">
+<form action="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/" method="GET" name="ganglia_form">
+  <div style="padding:5px;background-color:#dddddd">
+     <big style="float:left;"><b id="page_title">j-1MM0DOB1TUSN2 Cluster Report at Thu, 30 Jun 2016 02:01:36 +0000</b></big><input style="float:right;" class="header_btn ui-button ui-widget ui-state-default ui-corner-all" type="submit" value="Get Fresh Data" role="button" aria-disabled="false"><div style="clear:both"></div>
+  </div>
+  <div style="padding:5px 5px 0 5px;">
+    <div style="float:left;" id="range_menu" class="nobr ui-buttonset">Last&nbsp;&nbsp;<input onchange="ganglia_form.submit();" type="radio" id="range-hour" name="r" value="hour" checked="checked" class="ui-helper-hidden-accessible"><label for="range-hour" class="ui-state-active ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left" role="button" aria-disabled="false"><span class="ui-button-text">hour</span></label><input onchange="ganglia_form.submit();" type="radio" id="range-2hr" name="r" value="2hr" class="ui-helper-hidden-accessible"><label for="range-2hr" class="ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">2hr</span></label><input onchange="ganglia_form.submit();" type="radio" id="range-4hr" name="r" value="4hr" class="ui-helper-hidden-accessible"><label for="range-4hr" class="ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">4hr</span></label><input onchange="ganglia_form.submit();" type="radio" id="range-day" name="r" value="day" class="ui-helper-hidden-accessible"><label for="range-day" class="ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">day</span></label><input onchange="ganglia_form.submit();" type="radio" id="range-week" name="r" value="week" class="ui-helper-hidden-accessible"><label for="range-week" class="ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">week</span></label><input onchange="ganglia_form.submit();" type="radio" id="range-month" name="r" value="month" class="ui-helper-hidden-accessible"><label for="range-month" class="ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">month</span></label><input onchange="ganglia_form.submit();" type="radio" id="range-year" name="r" value="year" class="ui-helper-hidden-accessible"><label for="range-year" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">year</span></label></div>
+    <div style="float:left;" id="custom_range_menu" class="ui-buttonset">or <span class="nobr">from <input type="TEXT" title="Feb 27 2007 00:00, 2/27/2007, 27.2.2007, now -1 week, -2 days, start + 1 hour, etc." name="cs" id="datepicker-cs" size="17" class="hasDatepicker"><img class="ui-datepicker-trigger" src="./Ganglia_skew_files/calendar.gif" alt="..." title="..."> to <input type="TEXT" title="Feb 27 2007 00:00, 2/27/2007, 27.2.2007, now -1 week, -2 days, start + 1 hour, etc." name="ce" id="datepicker-ce" size="17" class="hasDatepicker"><img class="ui-datepicker-trigger" src="./Ganglia_skew_files/calendar.gif" alt="..." title="..."> <input type="submit" value="Go" class="ui-button ui-widget ui-state-default ui-corner-left" role="button" aria-disabled="false">
+<input type="button" value="Clear" onclick="ganglia_submit(1)" class="ui-button ui-widget ui-state-default ui-corner-right" role="button" aria-disabled="false"></span>
+</div>
+    <div style="float:right;">&nbsp;&nbsp;<button class="header_btn ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" onclick="window.location=&#39;./?p=2&amp;c=j-1MM0DOB1TUSN2&#39;;return false;" role="button" aria-disabled="false"><span class="ui-button-text">Physical View</span></button></div>
+    <div style="clear:both;"></div>
+  </div>
+  
+  
+    <div id="node_menu" style="padding:5px 5px 0 5px;">
+    <b><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2">EMR Grid</a></b> <b>&gt;</b>
+<b><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?c=j-1MM0DOB1TUSN2&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2">j-1MM0DOB1TUSN2</a></b> <b>&gt;</b>
+<input type="hidden" name="c" value="j-1MM0DOB1TUSN2">
+<select name="h" onchange="ganglia_form.submit();"><option value="">--Choose a Node</option><option value="ip-172-28-17-185.ap-southeast-2.compute.internal">ip-172-28-17-185.ap-southeast-2.compute.internal
+</option><option value="ip-172-28-22-41.ap-southeast-2.compute.internal">ip-172-28-22-41.ap-southeast-2.compute.internal
+</option><option value="ip-172-28-49-76.ap-southeast-2.compute.internal">ip-172-28-49-76.ap-southeast-2.compute.internal
+</option><option value="ip-172-28-203-39.ap-southeast-2.compute.internal">ip-172-28-203-39.ap-southeast-2.compute.internal
+</option><option value="ip-172-28-207-11.ap-southeast-2.compute.internal">ip-172-28-207-11.ap-southeast-2.compute.internal
+</option></select>
+&nbsp;&nbsp;
+  </div>
+  
+
+<input type="hidden" name="tab" id="selected_tab" value="m">
+<input type="hidden" id="vn" name="vn" value="">
+<input type="hidden" id="hide-hf" name="hide-hf" value="false">
+
+<input type="hidden" id="overlay_events" value="true">
+
+<hr size="1" noshade="">
+<!-- End header.tpl -->
+<!-- Begin cluster_view.tpl -->
+<script type="text/javascript" src="./Ganglia_skew_files/protovis.min.js"></script>
+
+<script type="text/javascript">
+function Heatmap(elem_id, data) {
+  this.elem_id = elem_id;
+  this.data = data;
+  this.num_cols = data.length;
+  this.cell_size = $("#" + elem_id).height() / this.num_cols;
+  var this_map = this;
+
+  this.vis = new pv.Panel()
+    .width($("#" + elem_id).width())
+    .height($("#" + elem_id).height())
+    .margin(2)
+    .strokeStyle("#aaa")
+    .lineWidth(4)
+    .antialias(false);
+
+  this.fill = pv.Scale.linear().
+    domain(0, 0.25, 0.5, 0.75, 1.00).
+    range("#e2ecff", "#caff98", "#ffde5e", "#ffa15e", "#ff634f");
+
+  this.row = this.vis.add(pv.Panel)
+    .data(pv.range(this.num_cols))
+    .height(this.cell_size)
+    .top(function(d) { return d * this_map.cell_size;});
+
+  this.cell = this.row.add(pv.Panel)
+    .data(pv.range(this.num_cols))
+    .height(this.cell_size)
+    .width(this.cell_size)
+    .left(function(d) { return d * this_map.cell_size;})
+    .fillStyle(function(col_index, row_index) { return this_map.fill(this_map.data[row_index][col_index].load);})
+    .title(function(col_index, row_index) { return this_map.data[row_index][col_index].host + ", load = " + (this_map.data[row_index][col_index].load * 100).toFixed(0) + "%";});
+}
+
+Heatmap.prototype.setData = function(data) {
+  this.data = data;
+  this.num_cols = data.length;
+  this.cell_size = $("#" + this.elem_id).height() / this.num_cols;
+}
+
+Heatmap.prototype.render = function() {
+  this.vis.render();
+}
+
+function refreshClusterView() {
+  $.get('cluster_view.php?' + jQuery.param.querystring() + '&refresh', function(data) {
+    var item = data.split("<!-- || -->");
+
+    $('#cluster_title').html(item[1]);
+
+    $('#cluster_overview').html(item[2]);
+
+    if ($('#load_pie').size())
+      $('#load_pie').attr("src", item[3].replace(/&amp;/g, "&"));
+
+    if ($('#heatmap-fig').size()) {
+      eval("heatmap.setData(" + item[4] + ")");
+      heatmap.render();
+    }
+
+    if ($('#stacked_graph').size()) {
+      var localtimestamp = parseInt(item[0]);
+      var src = $('#stacked_graph').attr('src');
+      $('#stacked_graph').attr("src", jQuery.param.querystring(src, "&st=" + localtimestamp));
+    }
+
+    var host_metric_graphs = $('#host_metric_graphs');
+    host_metric_graphs.css('height', host_metric_graphs.height() + "px");
+    host_metric_graphs.html(item[5]);
+  });
+
+  $("#optional_graphs img").each(function (index) {
+    var src = $(this).attr("src");
+    if ((src.indexOf("graph.php") == 0) ||
+        (src.indexOf("./graph.php") == 0)) {
+      var d = new Date();
+      $(this).attr("src", jQuery.param.querystring(src, "&_=" + d.getTime()));
+    }    
+  });
+}
+
+$(function() {
+  // Modified from http://jqueryui.com/demos/toggle/
+  // run the currently selected effect
+  function runEffect(id){
+    // most effect types need no options passed by default
+    var options = { };
+
+    options = { to: { width: 200,height: 60 } }; 
+    
+    // run the effect
+    $("#"+id+"_div").toggle("blind",options,500);
+  };
+ 
+  // set effect from select menu value
+  $('.button').click(function(event) {
+    runEffect(event.target.id);
+    return false;
+  });
+
+  $("#edit_optional_graphs").dialog({ autoOpen: 
+                                      false, minWidth: 550,
+                                      beforeClose: function(event, ui) {  
+                                        location.reload(true); 
+                                      }});
+  $("#edit_optional_graphs_button").button();
+  $("#save_optional_graphs_button").button();
+  $("#close_edit_optional_graphs_link").button();
+
+  $("#edit_optional_graphs_button").click(function(event) {
+    $("#edit_optional_graphs").dialog('open');
+    $('#edit_optional_graphs_content').html('<img src="img/spinner.gif">');
+    $.get('edit_optional_graphs.php', 
+          "clustername=j-1MM0DOB1TUSN2", 
+          function(data) {
+            $('#edit_optional_graphs_content').html(data);
+          });
+    return false;
+  });
+
+  $("#save_optional_graphs_button").click(function(event) {
+    $.get('edit_optional_graphs.php', 
+          $("#edit_optional_reports_form").serialize(), 
+          function(data) {
+            $('#edit_optional_graphs_content').html(data);
+            $("#save_optional_graphs_button").hide();
+            setTimeout(function() {
+              $('#edit_optional_graphs').dialog('close');}, 5000);
+          });
+    return false;
+  });
+
+  $("#show_hosts_scaled").buttonset();
+
+      $("#metrics-picker").chosen({ max_selected_options:1,
+                                  search_contains:true,
+                                  no_results_text:"No metrics matched",
+                                  placeholder_text_single:"Select a metric"}).
+    on('change', function (evt, params) { ganglia_form.submit();});
+  
+});
+</script>
+
+
+
+<style type="text/css">
+  .toggler { width: 500px; height: 200px; }
+  a.button { padding: .15em 1em; text-decoration: none; }
+  #effect { width: 240px; height: 135px; padding: 0.4em; position: relative; }
+  #effect h3 { margin: 0; padding: 0.4em; text-align: center; }
+  #heatmap-fig {
+    width: 200px;
+    height: 200px;
+  } 
+</style>
+
+
+
+<div style="background:rgb(238,238,238);text-align:center;">
+  <font size="+1" id="cluster_title">Overview of j-1MM0DOB1TUSN2 @ 2016-06-30 02:01</font>
+</div>
+
+<table border="0" cellspacing="4" width="100%">
+<tbody><tr>
+<td align="left" valign="top">
+<div id="cluster_overview">
+<table cellspacing="1" cellpadding="1" width="100%" border="0">
+ <tbody><tr><td>CPUs Total:</td><td align="left"><b>20</b></td></tr>
+ <tr><td width="60%">Hosts up:</td><td align="left"><b>5</b></td></tr>
+ <tr><td>Hosts down:</td><td align="left"><b>0</b></td></tr>
+ <tr><td>&nbsp;</td></tr>
+ <tr><td colspan="2"><font class="nobr">Current Load Avg (15, 5, 1m):</font><br>&nbsp;&nbsp;<b>5%, 4%, 1%</b></td></tr>
+ <tr><td colspan="2">Avg Utilization (last hour):<br>&nbsp;&nbsp;<b>7%</b></td></tr>
+ </tbody></table>
+
+</div>
+<!-- A place to put custom HTML for the cluster view. -->
+
+
+</td>
+<td rowspan="2" align="center" valign="top">
+<div id="optional_graphs" style="padding-bottom:4px">
+<a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/graph_all_periods.php?c=j-1MM0DOB1TUSN2&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2&amp;st=1467252084&amp;g=cpu_report&amp;z=large">
+    <img border="0" style="padding:2px;" class="cluster_zoomable" title="j-1MM0DOB1TUSN2" src="./Ganglia_skew_files/graph.php"></a>
+<a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/graph_all_periods.php?c=j-1MM0DOB1TUSN2&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2&amp;st=1467252084&amp;g=mem_report&amp;z=large">
+    <img border="0" style="padding:2px;" class="cluster_zoomable" title="j-1MM0DOB1TUSN2" src="./Ganglia_skew_files/graph(1).php"></a>
+<a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/graph_all_periods.php?c=j-1MM0DOB1TUSN2&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2&amp;st=1467252084&amp;g=load_report&amp;z=large">
+    <img border="0" style="padding:2px;" class="cluster_zoomable" title="j-1MM0DOB1TUSN2" src="./Ganglia_skew_files/graph(2).php"></a>
+<a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/graph_all_periods.php?c=j-1MM0DOB1TUSN2&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2&amp;st=1467252084&amp;g=network_report&amp;z=large">
+    <img border="0" style="padding:2px;" class="cluster_zoomable" title="j-1MM0DOB1TUSN2" src="./Ganglia_skew_files/graph(3).php"></a>
+<br>
+
+</div>
+<button id="edit_optional_graphs_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Edit Optional Graphs</span></button>
+
+</td>
+</tr>
+
+<tr>
+ <td align="center" valign="top">
+
+Server Load Distribution<br>
+<div id="heatmap-fig">
+<script type="text/javascript">
+var heatmap = new Heatmap("heatmap-fig", [[{host:"ip-172-28-17-185.ap-southeast-2.compute.internal",load:0.0225},{host:"ip-172-28-22-41.ap-southeast-2.compute.internal",load:0},{host:"ip-172-28-49-76.ap-southeast-2.compute.internal",load:0.0225}],[{host:"ip-172-28-203-39.ap-southeast-2.compute.internal",load:0.0275},{host:"ip-172-28-207-11.ap-southeast-2.compute.internal",load:0},{host:"unused",load:0},{host:"unused",load:0},{host:"unused",load:0},{host:"unused",load:0}]]);
+heatmap.render();
+    </script><span style="display: inline-block;"><svg font-size="10px" font-family="sans-serif" fill="none" stroke="none" stroke-width="1.5" width="204" height="204"><g transform="translate(2,2)"><g><a title="ip-172-28-17-185.ap-southeast-2.compute.internal, load = 2%"><rect width="100" height="100" fill="rgb(224,238,246)"></rect></a><a title="ip-172-28-22-41.ap-southeast-2.compute.internal, load = 0%"><rect x="100" width="100" height="100" fill="rgb(226,236,255)"></rect></a></g><g transform="translate(0,100)"><a title="ip-172-28-203-39.ap-southeast-2.compute.internal, load = 3%"><rect width="100" height="100" fill="rgb(223,238,244)"></rect></a><a title="ip-172-28-207-11.ap-southeast-2.compute.internal, load = 0%"><rect x="100" width="100" height="100" fill="rgb(226,236,255)"></rect></a></g></g><rect shape-rendering="crispEdges" x="2" y="2" width="200" height="200" stroke="rgb(170,170,170)" stroke-width="4"></rect></svg></span>
+ </div>
+
+ </td>
+</tr>
+</tbody></table>
+
+<center>
+<table width="100%" border="0">
+<tbody><tr>
+  <td colspan="1">
+  <font size="+1" style="text-align:center">Stacked Graph - load_one </font> 
+  </td>
+</tr>
+<tr>
+  <td>
+  <center><img id="stacked_graph" src="./Ganglia_skew_files/stacked.php" alt="j-1MM0DOB1TUSN2 load_one "></center>
+  </td>
+</tr>
+</tbody></table>
+</center>
+
+
+<div id="cluster_view_chooser" style="padding:5px;background:rgb(238,238,238);">
+  <div style="text-align:center;padding:5px;">
+        <div class="nobr">j-1MM0DOB1TUSN2 <strong>load_one </strong>
+      last <strong>hour</strong>
+      sorted <strong>by name</strong>
+    </div>
+    <div style="display:inline;">
+     Metric&nbsp;
+            <select name="m" id="metrics-picker" style="display: none;"><option value="apache_report">apache_report</option><option value="apache_response_report">apache_response_report</option><option value="boottime">boottime</option><option value="bytes_in">bytes_in</option><option value="bytes_out">bytes_out</option><option value="cpu_aidle">cpu_aidle</option><option value="cpu_idle">cpu_idle</option><option value="cpu_nice">cpu_nice</option><option value="cpu_num">cpu_num</option><option value="cpu_report">cpu_report</option><option value="cpu_speed">cpu_speed</option><option value="cpu_steal">cpu_steal</option><option value="cpu_system">cpu_system</option><option value="cpu_user">cpu_user</option><option value="cpu_wio">cpu_wio</option><option value="default.StartupProgress.ElapsedTime">default.StartupProgress.ElapsedTime</option><option value="default.StartupProgress.LoadingEditsCount">default.StartupProgress.LoadingEditsCount</option><option value="default.StartupProgress.LoadingEditsElapsedTime">default.StartupProgress.LoadingEditsElapsedTime</option><option value="default.StartupProgress.LoadingEditsPercentComplete">default.StartupProgress.LoadingEditsPercentComplete</option><option value="default.StartupProgress.LoadingEditsTotal">default.StartupProgress.LoadingEditsTotal</option><option value="default.StartupProgress.LoadingFsImageCount">default.StartupProgress.LoadingFsImageCount</option><option value="default.StartupProgress.LoadingFsImageElapsedTime">default.StartupProgress.LoadingFsImageElapsedTime</option><option value="default.StartupProgress.LoadingFsImagePercentComplete">default.StartupProgress.LoadingFsImagePercentComplete</option><option value="default.StartupProgress.LoadingFsImageTotal">default.StartupProgress.LoadingFsImageTotal</option><option value="default.StartupProgress.PercentComplete">default.StartupProgress.PercentComplete</option><option value="default.StartupProgress.SafeModeCount">default.StartupProgress.SafeModeCount</option><option value="default.StartupProgress.SafeModeElapsedTime">default.StartupProgress.SafeModeElapsedTime</option><option value="default.StartupProgress.SafeModePercentComplete">default.StartupProgress.SafeModePercentComplete</option><option value="default.StartupProgress.SafeModeTotal">default.StartupProgress.SafeModeTotal</option><option value="default.StartupProgress.SavingCheckpointCount">default.StartupProgress.SavingCheckpointCount</option><option value="default.StartupProgress.SavingCheckpointElapsedTime">default.StartupProgress.SavingCheckpointElapsedTime</option><option value="default.StartupProgress.SavingCheckpointPercentComplete">default.StartupProgress.SavingCheckpointPercentComplete</option><option value="default.StartupProgress.SavingCheckpointTotal">default.StartupProgress.SavingCheckpointTotal</option><option value="dfs.FSNamesystem.BlockCapacity">dfs.FSNamesystem.BlockCapacity</option><option value="dfs.FSNamesystem.BlocksTotal">dfs.FSNamesystem.BlocksTotal</option><option value="dfs.FSNamesystem.CapacityRemaining">dfs.FSNamesystem.CapacityRemaining</option><option value="dfs.FSNamesystem.CapacityRemainingGB">dfs.FSNamesystem.CapacityRemainingGB</option><option value="dfs.FSNamesystem.CapacityTotal">dfs.FSNamesystem.CapacityTotal</option><option value="dfs.FSNamesystem.CapacityTotalGB">dfs.FSNamesystem.CapacityTotalGB</option><option value="dfs.FSNamesystem.CapacityUsed">dfs.FSNamesystem.CapacityUsed</option><option value="dfs.FSNamesystem.CapacityUsedGB">dfs.FSNamesystem.CapacityUsedGB</option><option value="dfs.FSNamesystem.CapacityUsedNonDFS">dfs.FSNamesystem.CapacityUsedNonDFS</option><option value="dfs.FSNamesystem.CorruptBlocks">dfs.FSNamesystem.CorruptBlocks</option><option value="dfs.FSNamesystem.ExcessBlocks">dfs.FSNamesystem.ExcessBlocks</option><option value="dfs.FSNamesystem.ExpiredHeartbeats">dfs.FSNamesystem.ExpiredHeartbeats</option><option value="dfs.FSNamesystem.FilesTotal">dfs.FSNamesystem.FilesTotal</option><option value="dfs.FSNamesystem.LastCheckpointTime">dfs.FSNamesystem.LastCheckpointTime</option><option value="dfs.FSNamesystem.LastWrittenTransactionId">dfs.FSNamesystem.LastWrittenTransactionId</option><option value="dfs.FSNamesystem.MillisSinceLastLoadedEdits">dfs.FSNamesystem.MillisSinceLastLoadedEdits</option><option value="dfs.FSNamesystem.MissingBlocks">dfs.FSNamesystem.MissingBlocks</option><option value="dfs.FSNamesystem.MissingReplOneBlocks">dfs.FSNamesystem.MissingReplOneBlocks</option><option value="dfs.FSNamesystem.PendingDataNodeMessageCount">dfs.FSNamesystem.PendingDataNodeMessageCount</option><option value="dfs.FSNamesystem.PendingDeletionBlocks">dfs.FSNamesystem.PendingDeletionBlocks</option><option value="dfs.FSNamesystem.PendingReplicationBlocks">dfs.FSNamesystem.PendingReplicationBlocks</option><option value="dfs.FSNamesystem.PostponedMisreplicatedBlocks">dfs.FSNamesystem.PostponedMisreplicatedBlocks</option><option value="dfs.FSNamesystem.ScheduledReplicationBlocks">dfs.FSNamesystem.ScheduledReplicationBlocks</option><option value="dfs.FSNamesystem.Snapshots">dfs.FSNamesystem.Snapshots</option><option value="dfs.FSNamesystem.SnapshottableDirectories">dfs.FSNamesystem.SnapshottableDirectories</option><option value="dfs.FSNamesystem.StaleDataNodes">dfs.FSNamesystem.StaleDataNodes</option><option value="dfs.FSNamesystem.TotalFiles">dfs.FSNamesystem.TotalFiles</option><option value="dfs.FSNamesystem.TotalLoad">dfs.FSNamesystem.TotalLoad</option><option value="dfs.FSNamesystem.TransactionsSinceLastCheckpoint">dfs.FSNamesystem.TransactionsSinceLastCheckpoint</option><option value="dfs.FSNamesystem.TransactionsSinceLastLogRoll">dfs.FSNamesystem.TransactionsSinceLastLogRoll</option><option value="dfs.FSNamesystem.UnderReplicatedBlocks">dfs.FSNamesystem.UnderReplicatedBlocks</option><option value="dfs.FSNamesystem.numDeadDataNodes">dfs.FSNamesystem.numDeadDataNodes</option><option value="dfs.FSNamesystem.numLiveDataNodes">dfs.FSNamesystem.numLiveDataNodes</option><option value="dfs.datanode.BlockChecksumOpAvgTime">dfs.datanode.BlockChecksumOpAvgTime</option><option value="dfs.datanode.BlockChecksumOpNumOps">dfs.datanode.BlockChecksumOpNumOps</option><option value="dfs.datanode.BlockReportsAvgTime">dfs.datanode.BlockReportsAvgTime</option><option value="dfs.datanode.BlockReportsNumOps">dfs.datanode.BlockReportsNumOps</option><option value="dfs.datanode.BlockVerificationFailures">dfs.datanode.BlockVerificationFailures</option><option value="dfs.datanode.BlocksCached">dfs.datanode.BlocksCached</option><option value="dfs.datanode.BlocksGetLocalPathInfo">dfs.datanode.BlocksGetLocalPathInfo</option><option value="dfs.datanode.BlocksRead">dfs.datanode.BlocksRead</option><option value="dfs.datanode.BlocksRemoved">dfs.datanode.BlocksRemoved</option><option value="dfs.datanode.BlocksReplicated">dfs.datanode.BlocksReplicated</option><option value="dfs.datanode.BlocksUncached">dfs.datanode.BlocksUncached</option><option value="dfs.datanode.BlocksVerified">dfs.datanode.BlocksVerified</option><option value="dfs.datanode.BlocksWritten">dfs.datanode.BlocksWritten</option><option value="dfs.datanode.BytesRead">dfs.datanode.BytesRead</option><option value="dfs.datanode.BytesWritten">dfs.datanode.BytesWritten</option><option value="dfs.datanode.CacheReportsAvgTime">dfs.datanode.CacheReportsAvgTime</option><option value="dfs.datanode.CacheReportsNumOps">dfs.datanode.CacheReportsNumOps</option><option value="dfs.datanode.CopyBlockOpAvgTime">dfs.datanode.CopyBlockOpAvgTime</option><option value="dfs.datanode.CopyBlockOpNumOps">dfs.datanode.CopyBlockOpNumOps</option><option value="dfs.datanode.DatanodeNetworkErrors">dfs.datanode.DatanodeNetworkErrors</option><option value="dfs.datanode.FlushNanosAvgTime">dfs.datanode.FlushNanosAvgTime</option><option value="dfs.datanode.FlushNanosNumOps">dfs.datanode.FlushNanosNumOps</option><option value="dfs.datanode.FsyncCount">dfs.datanode.FsyncCount</option><option value="dfs.datanode.FsyncNanosAvgTime">dfs.datanode.FsyncNanosAvgTime</option><option value="dfs.datanode.FsyncNanosNumOps">dfs.datanode.FsyncNanosNumOps</option><option value="dfs.datanode.HeartbeatsAvgTime">dfs.datanode.HeartbeatsAvgTime</option><option value="dfs.datanode.HeartbeatsNumOps">dfs.datanode.HeartbeatsNumOps</option><option value="dfs.datanode.IncrementalBlockReportsAvgTime">dfs.datanode.IncrementalBlockReportsAvgTime</option><option value="dfs.datanode.IncrementalBlockReportsNumOps">dfs.datanode.IncrementalBlockReportsNumOps</option><option value="dfs.datanode.PacketAckRoundTripTimeNanosAvgTime">dfs.datanode.PacketAckRoundTripTimeNanosAvgTime</option><option value="dfs.datanode.PacketAckRoundTripTimeNanosNumOps">dfs.datanode.PacketAckRoundTripTimeNanosNumOps</option><option value="dfs.datanode.RamDiskBlocksDeletedBeforeLazyPersisted">dfs.datanode.RamDiskBlocksDeletedBeforeLazyPersisted</option><option value="dfs.datanode.RamDiskBlocksEvicted">dfs.datanode.RamDiskBlocksEvicted</option><option value="dfs.datanode.RamDiskBlocksEvictedWithoutRead">dfs.datanode.RamDiskBlocksEvictedWithoutRead</option><option value="dfs.datanode.RamDiskBlocksEvictionWindowMsAvgTime">dfs.datanode.RamDiskBlocksEvictionWindowMsAvgTime</option><option value="dfs.datanode.RamDiskBlocksEvictionWindowMsNumOps">dfs.datanode.RamDiskBlocksEvictionWindowMsNumOps</option><option value="dfs.datanode.RamDiskBlocksLazyPersistWindowMsAvgTime">dfs.datanode.RamDiskBlocksLazyPersistWindowMsAvgTime</option><option value="dfs.datanode.RamDiskBlocksLazyPersistWindowMsNumOps">dfs.datanode.RamDiskBlocksLazyPersistWindowMsNumOps</option><option value="dfs.datanode.RamDiskBlocksLazyPersisted">dfs.datanode.RamDiskBlocksLazyPersisted</option><option value="dfs.datanode.RamDiskBlocksReadHits">dfs.datanode.RamDiskBlocksReadHits</option><option value="dfs.datanode.RamDiskBlocksWrite">dfs.datanode.RamDiskBlocksWrite</option><option value="dfs.datanode.RamDiskBlocksWriteFallback">dfs.datanode.RamDiskBlocksWriteFallback</option><option value="dfs.datanode.RamDiskBytesLazyPersisted">dfs.datanode.RamDiskBytesLazyPersisted</option><option value="dfs.datanode.RamDiskBytesWrite">dfs.datanode.RamDiskBytesWrite</option><option value="dfs.datanode.ReadBlockOpAvgTime">dfs.datanode.ReadBlockOpAvgTime</option><option value="dfs.datanode.ReadBlockOpNumOps">dfs.datanode.ReadBlockOpNumOps</option><option value="dfs.datanode.ReadsFromLocalClient">dfs.datanode.ReadsFromLocalClient</option><option value="dfs.datanode.ReadsFromRemoteClient">dfs.datanode.ReadsFromRemoteClient</option><option value="dfs.datanode.RemoteBytesRead">dfs.datanode.RemoteBytesRead</option><option value="dfs.datanode.RemoteBytesWritten">dfs.datanode.RemoteBytesWritten</option><option value="dfs.datanode.ReplaceBlockOpAvgTime">dfs.datanode.ReplaceBlockOpAvgTime</option><option value="dfs.datanode.ReplaceBlockOpNumOps">dfs.datanode.ReplaceBlockOpNumOps</option><option value="dfs.datanode.SendDataPacketBlockedOnNetworkNanosAvgTime">dfs.datanode.SendDataPacketBlockedOnNetworkNanosAvgTime</option><option value="dfs.datanode.SendDataPacketBlockedOnNetworkNanosNumOps">dfs.datanode.SendDataPacketBlockedOnNetworkNanosNumOps</option><option value="dfs.datanode.SendDataPacketTransferNanosAvgTime">dfs.datanode.SendDataPacketTransferNanosAvgTime</option><option value="dfs.datanode.SendDataPacketTransferNanosNumOps">dfs.datanode.SendDataPacketTransferNanosNumOps</option><option value="dfs.datanode.TotalReadTime">dfs.datanode.TotalReadTime</option><option value="dfs.datanode.TotalWriteTime">dfs.datanode.TotalWriteTime</option><option value="dfs.datanode.VolumeFailures">dfs.datanode.VolumeFailures</option><option value="dfs.datanode.WriteBlockOpAvgTime">dfs.datanode.WriteBlockOpAvgTime</option><option value="dfs.datanode.WriteBlockOpNumOps">dfs.datanode.WriteBlockOpNumOps</option><option value="dfs.datanode.WritesFromLocalClient">dfs.datanode.WritesFromLocalClient</option><option value="dfs.datanode.WritesFromRemoteClient">dfs.datanode.WritesFromRemoteClient</option><option value="dfs.namenode.AddBlockOps">dfs.namenode.AddBlockOps</option><option value="dfs.namenode.AllowSnapshotOps">dfs.namenode.AllowSnapshotOps</option><option value="dfs.namenode.BlockReceivedAndDeletedOps">dfs.namenode.BlockReceivedAndDeletedOps</option><option value="dfs.namenode.BlockReportAvgTime">dfs.namenode.BlockReportAvgTime</option><option value="dfs.namenode.BlockReportNumOps">dfs.namenode.BlockReportNumOps</option><option value="dfs.namenode.CacheReportAvgTime">dfs.namenode.CacheReportAvgTime</option><option value="dfs.namenode.CacheReportNumOps">dfs.namenode.CacheReportNumOps</option><option value="dfs.namenode.CreateFileOps">dfs.namenode.CreateFileOps</option><option value="dfs.namenode.CreateSnapshotOps">dfs.namenode.CreateSnapshotOps</option><option value="dfs.namenode.CreateSymlinkOps">dfs.namenode.CreateSymlinkOps</option><option value="dfs.namenode.DeleteFileOps">dfs.namenode.DeleteFileOps</option><option value="dfs.namenode.DeleteSnapshotOps">dfs.namenode.DeleteSnapshotOps</option><option value="dfs.namenode.DisallowSnapshotOps">dfs.namenode.DisallowSnapshotOps</option><option value="dfs.namenode.FileInfoOps">dfs.namenode.FileInfoOps</option><option value="dfs.namenode.FilesAppended">dfs.namenode.FilesAppended</option><option value="dfs.namenode.FilesCreated">dfs.namenode.FilesCreated</option><option value="dfs.namenode.FilesDeleted">dfs.namenode.FilesDeleted</option><option value="dfs.namenode.FilesInGetListingOps">dfs.namenode.FilesInGetListingOps</option><option value="dfs.namenode.FilesRenamed">dfs.namenode.FilesRenamed</option><option value="dfs.namenode.FilesTruncated">dfs.namenode.FilesTruncated</option><option value="dfs.namenode.FsImageLoadTime">dfs.namenode.FsImageLoadTime</option><option value="dfs.namenode.GetAdditionalDatanodeOps">dfs.namenode.GetAdditionalDatanodeOps</option><option value="dfs.namenode.GetBlockLocations">dfs.namenode.GetBlockLocations</option><option value="dfs.namenode.GetEditAvgTime">dfs.namenode.GetEditAvgTime</option><option value="dfs.namenode.GetEditNumOps">dfs.namenode.GetEditNumOps</option><option value="dfs.namenode.GetImageAvgTime">dfs.namenode.GetImageAvgTime</option><option value="dfs.namenode.GetImageNumOps">dfs.namenode.GetImageNumOps</option><option value="dfs.namenode.GetLinkTargetOps">dfs.namenode.GetLinkTargetOps</option><option value="dfs.namenode.GetListingOps">dfs.namenode.GetListingOps</option><option value="dfs.namenode.ListSnapshottableDirOps">dfs.namenode.ListSnapshottableDirOps</option><option value="dfs.namenode.PutImageAvgTime">dfs.namenode.PutImageAvgTime</option><option value="dfs.namenode.PutImageNumOps">dfs.namenode.PutImageNumOps</option><option value="dfs.namenode.RenameSnapshotOps">dfs.namenode.RenameSnapshotOps</option><option value="dfs.namenode.SafeModeTime">dfs.namenode.SafeModeTime</option><option value="dfs.namenode.SnapshotDiffReportOps">dfs.namenode.SnapshotDiffReportOps</option><option value="dfs.namenode.StorageBlockReportOps">dfs.namenode.StorageBlockReportOps</option><option value="dfs.namenode.SyncsAvgTime">dfs.namenode.SyncsAvgTime</option><option value="dfs.namenode.SyncsNumOps">dfs.namenode.SyncsNumOps</option><option value="dfs.namenode.TotalFileOps">dfs.namenode.TotalFileOps</option><option value="dfs.namenode.TransactionsAvgTime">dfs.namenode.TransactionsAvgTime</option><option value="dfs.namenode.TransactionsBatchedInSync">dfs.namenode.TransactionsBatchedInSync</option><option value="dfs.namenode.TransactionsNumOps">dfs.namenode.TransactionsNumOps</option><option value="disk_free">disk_free</option><option value="disk_total">disk_total</option><option value="gexec">gexec</option><option value="gmond_started">gmond_started</option><option value="ip_address">ip_address</option><option value="jvm.JvmMetrics.GcCount">jvm.JvmMetrics.GcCount</option><option value="jvm.JvmMetrics.GcCountPS%20MarkSweep">jvm.JvmMetrics.GcCountPS MarkSweep</option><option value="jvm.JvmMetrics.GcCountPS%20Scavenge">jvm.JvmMetrics.GcCountPS Scavenge</option><option value="jvm.JvmMetrics.GcNumInfoThresholdExceeded">jvm.JvmMetrics.GcNumInfoThresholdExceeded</option><option value="jvm.JvmMetrics.GcNumWarnThresholdExceeded">jvm.JvmMetrics.GcNumWarnThresholdExceeded</option><option value="jvm.JvmMetrics.GcTimeMillis">jvm.JvmMetrics.GcTimeMillis</option><option value="jvm.JvmMetrics.GcTimeMillisPS%20MarkSweep">jvm.JvmMetrics.GcTimeMillisPS MarkSweep</option><option value="jvm.JvmMetrics.GcTimeMillisPS%20Scavenge">jvm.JvmMetrics.GcTimeMillisPS Scavenge</option><option value="jvm.JvmMetrics.GcTotalExtraSleepTime">jvm.JvmMetrics.GcTotalExtraSleepTime</option><option value="jvm.JvmMetrics.LogError">jvm.JvmMetrics.LogError</option><option value="jvm.JvmMetrics.LogFatal">jvm.JvmMetrics.LogFatal</option><option value="jvm.JvmMetrics.LogInfo">jvm.JvmMetrics.LogInfo</option><option value="jvm.JvmMetrics.LogWarn">jvm.JvmMetrics.LogWarn</option><option value="jvm.JvmMetrics.MemHeapCommittedM">jvm.JvmMetrics.MemHeapCommittedM</option><option value="jvm.JvmMetrics.MemHeapMaxM">jvm.JvmMetrics.MemHeapMaxM</option><option value="jvm.JvmMetrics.MemHeapUsedM">jvm.JvmMetrics.MemHeapUsedM</option><option value="jvm.JvmMetrics.MemMaxM">jvm.JvmMetrics.MemMaxM</option><option value="jvm.JvmMetrics.MemNonHeapCommittedM">jvm.JvmMetrics.MemNonHeapCommittedM</option><option value="jvm.JvmMetrics.MemNonHeapMaxM">jvm.JvmMetrics.MemNonHeapMaxM</option><option value="jvm.JvmMetrics.MemNonHeapUsedM">jvm.JvmMetrics.MemNonHeapUsedM</option><option value="jvm.JvmMetrics.ThreadsBlocked">jvm.JvmMetrics.ThreadsBlocked</option><option value="jvm.JvmMetrics.ThreadsNew">jvm.JvmMetrics.ThreadsNew</option><option value="jvm.JvmMetrics.ThreadsRunnable">jvm.JvmMetrics.ThreadsRunnable</option><option value="jvm.JvmMetrics.ThreadsTerminated">jvm.JvmMetrics.ThreadsTerminated</option><option value="jvm.JvmMetrics.ThreadsTimedWaiting">jvm.JvmMetrics.ThreadsTimedWaiting</option><option value="jvm.JvmMetrics.ThreadsWaiting">jvm.JvmMetrics.ThreadsWaiting</option><option value="last_reported">last_reported</option><option value="last_reported_timestamp">last_reported_timestamp</option><option value="last_reported_uptime_in_sec">last_reported_uptime_in_sec</option><option value="load_all_report">load_all_report</option><option value="load_fifteen">load_fifteen</option><option value="load_five">load_five</option><option value="load_one">load_one</option><option value="load_report">load_report</option><option value="location">location</option><option value="machine_type">machine_type</option><option value="mapred.ShuffleMetrics.ShuffleConnections">mapred.ShuffleMetrics.ShuffleConnections</option><option value="mapred.ShuffleMetrics.ShuffleOutputBytes">mapred.ShuffleMetrics.ShuffleOutputBytes</option><option value="mapred.ShuffleMetrics.ShuffleOutputsFailed">mapred.ShuffleMetrics.ShuffleOutputsFailed</option><option value="mapred.ShuffleMetrics.ShuffleOutputsOK">mapred.ShuffleMetrics.ShuffleOutputsOK</option><option value="mem_buffers">mem_buffers</option><option value="mem_cached">mem_cached</option><option value="mem_free">mem_free</option><option value="mem_report">mem_report</option><option value="mem_shared">mem_shared</option><option value="mem_total">mem_total</option><option value="metricssystem.MetricsSystem.DroppedPubAll">metricssystem.MetricsSystem.DroppedPubAll</option><option value="metricssystem.MetricsSystem.NumActiveSinks">metricssystem.MetricsSystem.NumActiveSinks</option><option value="metricssystem.MetricsSystem.NumActiveSources">metricssystem.MetricsSystem.NumActiveSources</option><option value="metricssystem.MetricsSystem.NumAllSinks">metricssystem.MetricsSystem.NumAllSinks</option><option value="metricssystem.MetricsSystem.NumAllSources">metricssystem.MetricsSystem.NumAllSources</option><option value="metricssystem.MetricsSystem.PublishAvgTime">metricssystem.MetricsSystem.PublishAvgTime</option><option value="metricssystem.MetricsSystem.PublishNumOps">metricssystem.MetricsSystem.PublishNumOps</option><option value="metricssystem.MetricsSystem.Sink_cloudwatchAvgTime">metricssystem.MetricsSystem.Sink_cloudwatchAvgTime</option><option value="metricssystem.MetricsSystem.Sink_cloudwatchDropped">metricssystem.MetricsSystem.Sink_cloudwatchDropped</option><option value="metricssystem.MetricsSystem.Sink_cloudwatchNumOps">metricssystem.MetricsSystem.Sink_cloudwatchNumOps</option><option value="metricssystem.MetricsSystem.Sink_cloudwatchQsize">metricssystem.MetricsSystem.Sink_cloudwatchQsize</option><option value="metricssystem.MetricsSystem.Sink_gangliaAvgTime">metricssystem.MetricsSystem.Sink_gangliaAvgTime</option><option value="metricssystem.MetricsSystem.Sink_gangliaDropped">metricssystem.MetricsSystem.Sink_gangliaDropped</option><option value="metricssystem.MetricsSystem.Sink_gangliaNumOps">metricssystem.MetricsSystem.Sink_gangliaNumOps</option><option value="metricssystem.MetricsSystem.Sink_gangliaQsize">metricssystem.MetricsSystem.Sink_gangliaQsize</option><option value="metricssystem.MetricsSystem.SnapshotAvgTime">metricssystem.MetricsSystem.SnapshotAvgTime</option><option value="metricssystem.MetricsSystem.SnapshotNumOps">metricssystem.MetricsSystem.SnapshotNumOps</option><option value="network_report">network_report</option><option value="nfs_v3_client_report">nfs_v3_client_report</option><option value="os_name">os_name</option><option value="os_release">os_release</option><option value="packet_report">packet_report</option><option value="part_max_used">part_max_used</option><option value="pkts_in">pkts_in</option><option value="pkts_out">pkts_out</option><option value="proc_run">proc_run</option><option value="proc_total">proc_total</option><option value="rpc.RetryCache.NameNodeRetryCache.CacheCleared">rpc.RetryCache.NameNodeRetryCache.CacheCleared</option><option value="rpc.RetryCache.NameNodeRetryCache.CacheHit">rpc.RetryCache.NameNodeRetryCache.CacheHit</option><option value="rpc.RetryCache.NameNodeRetryCache.CacheUpdated">rpc.RetryCache.NameNodeRetryCache.CacheUpdated</option><option value="rpc.rpc.CallQueueLength">rpc.rpc.CallQueueLength</option><option value="rpc.rpc.NumOpenConnections">rpc.rpc.NumOpenConnections</option><option value="rpc.rpc.ReceivedBytes">rpc.rpc.ReceivedBytes</option><option value="rpc.rpc.RpcAuthenticationFailures">rpc.rpc.RpcAuthenticationFailures</option><option value="rpc.rpc.RpcAuthenticationSuccesses">rpc.rpc.RpcAuthenticationSuccesses</option><option value="rpc.rpc.RpcAuthorizationFailures">rpc.rpc.RpcAuthorizationFailures</option><option value="rpc.rpc.RpcAuthorizationSuccesses">rpc.rpc.RpcAuthorizationSuccesses</option><option value="rpc.rpc.RpcProcessingTimeAvgTime">rpc.rpc.RpcProcessingTimeAvgTime</option><option value="rpc.rpc.RpcProcessingTimeNumOps">rpc.rpc.RpcProcessingTimeNumOps</option><option value="rpc.rpc.RpcQueueTimeAvgTime">rpc.rpc.RpcQueueTimeAvgTime</option><option value="rpc.rpc.RpcQueueTimeNumOps">rpc.rpc.RpcQueueTimeNumOps</option><option value="rpc.rpc.SentBytes">rpc.rpc.SentBytes</option><option value="rpcdetailed.rpcdetailed.AddBlockAvgTime">rpcdetailed.rpcdetailed.AddBlockAvgTime</option><option value="rpcdetailed.rpcdetailed.AddBlockNumOps">rpcdetailed.rpcdetailed.AddBlockNumOps</option><option value="rpcdetailed.rpcdetailed.AllocateAvgTime">rpcdetailed.rpcdetailed.AllocateAvgTime</option><option value="rpcdetailed.rpcdetailed.AllocateNumOps">rpcdetailed.rpcdetailed.AllocateNumOps</option><option value="rpcdetailed.rpcdetailed.BlockReceivedAndDeletedAvgTime">rpcdetailed.rpcdetailed.BlockReceivedAndDeletedAvgTime</option><option value="rpcdetailed.rpcdetailed.BlockReceivedAndDeletedNumOps">rpcdetailed.rpcdetailed.BlockReceivedAndDeletedNumOps</option><option value="rpcdetailed.rpcdetailed.BlockReportAvgTime">rpcdetailed.rpcdetailed.BlockReportAvgTime</option><option value="rpcdetailed.rpcdetailed.BlockReportNumOps">rpcdetailed.rpcdetailed.BlockReportNumOps</option><option value="rpcdetailed.rpcdetailed.CompleteAvgTime">rpcdetailed.rpcdetailed.CompleteAvgTime</option><option value="rpcdetailed.rpcdetailed.CompleteNumOps">rpcdetailed.rpcdetailed.CompleteNumOps</option><option value="rpcdetailed.rpcdetailed.CreateAvgTime">rpcdetailed.rpcdetailed.CreateAvgTime</option><option value="rpcdetailed.rpcdetailed.CreateNumOps">rpcdetailed.rpcdetailed.CreateNumOps</option><option value="rpcdetailed.rpcdetailed.DeleteAvgTime">rpcdetailed.rpcdetailed.DeleteAvgTime</option><option value="rpcdetailed.rpcdetailed.DeleteNumOps">rpcdetailed.rpcdetailed.DeleteNumOps</option><option value="rpcdetailed.rpcdetailed.FinishApplicationMasterAvgTime">rpcdetailed.rpcdetailed.FinishApplicationMasterAvgTime</option><option value="rpcdetailed.rpcdetailed.FinishApplicationMasterNumOps">rpcdetailed.rpcdetailed.FinishApplicationMasterNumOps</option><option value="rpcdetailed.rpcdetailed.FsyncAvgTime">rpcdetailed.rpcdetailed.FsyncAvgTime</option><option value="rpcdetailed.rpcdetailed.FsyncNumOps">rpcdetailed.rpcdetailed.FsyncNumOps</option><option value="rpcdetailed.rpcdetailed.GetApplicationReportAvgTime">rpcdetailed.rpcdetailed.GetApplicationReportAvgTime</option><option value="rpcdetailed.rpcdetailed.GetApplicationReportNumOps">rpcdetailed.rpcdetailed.GetApplicationReportNumOps</option><option value="rpcdetailed.rpcdetailed.GetApplicationsAvgTime">rpcdetailed.rpcdetailed.GetApplicationsAvgTime</option><option value="rpcdetailed.rpcdetailed.GetApplicationsNumOps">rpcdetailed.rpcdetailed.GetApplicationsNumOps</option><option value="rpcdetailed.rpcdetailed.GetBlockLocationsAvgTime">rpcdetailed.rpcdetailed.GetBlockLocationsAvgTime</option><option value="rpcdetailed.rpcdetailed.GetBlockLocationsNumOps">rpcdetailed.rpcdetailed.GetBlockLocationsNumOps</option><option value="rpcdetailed.rpcdetailed.GetClusterMetricsAvgTime">rpcdetailed.rpcdetailed.GetClusterMetricsAvgTime</option><option value="rpcdetailed.rpcdetailed.GetClusterMetricsNumOps">rpcdetailed.rpcdetailed.GetClusterMetricsNumOps</option><option value="rpcdetailed.rpcdetailed.GetDatanodeReportAvgTime">rpcdetailed.rpcdetailed.GetDatanodeReportAvgTime</option><option value="rpcdetailed.rpcdetailed.GetDatanodeReportNumOps">rpcdetailed.rpcdetailed.GetDatanodeReportNumOps</option><option value="rpcdetailed.rpcdetailed.GetFileInfoAvgTime">rpcdetailed.rpcdetailed.GetFileInfoAvgTime</option><option value="rpcdetailed.rpcdetailed.GetFileInfoNumOps">rpcdetailed.rpcdetailed.GetFileInfoNumOps</option><option value="rpcdetailed.rpcdetailed.GetFsStatsAvgTime">rpcdetailed.rpcdetailed.GetFsStatsAvgTime</option><option value="rpcdetailed.rpcdetailed.GetFsStatsNumOps">rpcdetailed.rpcdetailed.GetFsStatsNumOps</option><option value="rpcdetailed.rpcdetailed.GetListingAvgTime">rpcdetailed.rpcdetailed.GetListingAvgTime</option><option value="rpcdetailed.rpcdetailed.GetListingNumOps">rpcdetailed.rpcdetailed.GetListingNumOps</option><option value="rpcdetailed.rpcdetailed.GetNewApplicationAvgTime">rpcdetailed.rpcdetailed.GetNewApplicationAvgTime</option><option value="rpcdetailed.rpcdetailed.GetNewApplicationNumOps">rpcdetailed.rpcdetailed.GetNewApplicationNumOps</option><option value="rpcdetailed.rpcdetailed.GetReplicaVisibleLengthAvgTime">rpcdetailed.rpcdetailed.GetReplicaVisibleLengthAvgTime</option><option value="rpcdetailed.rpcdetailed.GetReplicaVisibleLengthNumOps">rpcdetailed.rpcdetailed.GetReplicaVisibleLengthNumOps</option><option value="rpcdetailed.rpcdetailed.GetServerDefaultsAvgTime">rpcdetailed.rpcdetailed.GetServerDefaultsAvgTime</option><option value="rpcdetailed.rpcdetailed.GetServerDefaultsNumOps">rpcdetailed.rpcdetailed.GetServerDefaultsNumOps</option><option value="rpcdetailed.rpcdetailed.HeartbeatAvgTime">rpcdetailed.rpcdetailed.HeartbeatAvgTime</option><option value="rpcdetailed.rpcdetailed.HeartbeatNumOps">rpcdetailed.rpcdetailed.HeartbeatNumOps</option><option value="rpcdetailed.rpcdetailed.MkdirsAvgTime">rpcdetailed.rpcdetailed.MkdirsAvgTime</option><option value="rpcdetailed.rpcdetailed.MkdirsNumOps">rpcdetailed.rpcdetailed.MkdirsNumOps</option><option value="rpcdetailed.rpcdetailed.NodeHeartbeatAvgTime">rpcdetailed.rpcdetailed.NodeHeartbeatAvgTime</option><option value="rpcdetailed.rpcdetailed.NodeHeartbeatNumOps">rpcdetailed.rpcdetailed.NodeHeartbeatNumOps</option><option value="rpcdetailed.rpcdetailed.RefreshQueuesAvgTime">rpcdetailed.rpcdetailed.RefreshQueuesAvgTime</option><option value="rpcdetailed.rpcdetailed.RefreshQueuesNumOps">rpcdetailed.rpcdetailed.RefreshQueuesNumOps</option><option value="rpcdetailed.rpcdetailed.RegisterApplicationMasterAvgTime">rpcdetailed.rpcdetailed.RegisterApplicationMasterAvgTime</option><option value="rpcdetailed.rpcdetailed.RegisterApplicationMasterNumOps">rpcdetailed.rpcdetailed.RegisterApplicationMasterNumOps</option><option value="rpcdetailed.rpcdetailed.RegisterDatanodeAvgTime">rpcdetailed.rpcdetailed.RegisterDatanodeAvgTime</option><option value="rpcdetailed.rpcdetailed.RegisterDatanodeNumOps">rpcdetailed.rpcdetailed.RegisterDatanodeNumOps</option><option value="rpcdetailed.rpcdetailed.RegisterNodeManagerAvgTime">rpcdetailed.rpcdetailed.RegisterNodeManagerAvgTime</option><option value="rpcdetailed.rpcdetailed.RegisterNodeManagerNumOps">rpcdetailed.rpcdetailed.RegisterNodeManagerNumOps</option><option value="rpcdetailed.rpcdetailed.RenameAvgTime">rpcdetailed.rpcdetailed.RenameAvgTime</option><option value="rpcdetailed.rpcdetailed.RenameNumOps">rpcdetailed.rpcdetailed.RenameNumOps</option><option value="rpcdetailed.rpcdetailed.RenewLeaseAvgTime">rpcdetailed.rpcdetailed.RenewLeaseAvgTime</option><option value="rpcdetailed.rpcdetailed.RenewLeaseNumOps">rpcdetailed.rpcdetailed.RenewLeaseNumOps</option><option value="rpcdetailed.rpcdetailed.SendHeartbeatAvgTime">rpcdetailed.rpcdetailed.SendHeartbeatAvgTime</option><option value="rpcdetailed.rpcdetailed.SendHeartbeatNumOps">rpcdetailed.rpcdetailed.SendHeartbeatNumOps</option><option value="rpcdetailed.rpcdetailed.SetOwnerAvgTime">rpcdetailed.rpcdetailed.SetOwnerAvgTime</option><option value="rpcdetailed.rpcdetailed.SetOwnerNumOps">rpcdetailed.rpcdetailed.SetOwnerNumOps</option><option value="rpcdetailed.rpcdetailed.SetPermissionAvgTime">rpcdetailed.rpcdetailed.SetPermissionAvgTime</option><option value="rpcdetailed.rpcdetailed.SetPermissionNumOps">rpcdetailed.rpcdetailed.SetPermissionNumOps</option><option value="rpcdetailed.rpcdetailed.SetReplicationAvgTime">rpcdetailed.rpcdetailed.SetReplicationAvgTime</option><option value="rpcdetailed.rpcdetailed.SetReplicationNumOps">rpcdetailed.rpcdetailed.SetReplicationNumOps</option><option value="rpcdetailed.rpcdetailed.SetSafeModeAvgTime">rpcdetailed.rpcdetailed.SetSafeModeAvgTime</option><option value="rpcdetailed.rpcdetailed.SetSafeModeNumOps">rpcdetailed.rpcdetailed.SetSafeModeNumOps</option><option value="rpcdetailed.rpcdetailed.StartContainersAvgTime">rpcdetailed.rpcdetailed.StartContainersAvgTime</option><option value="rpcdetailed.rpcdetailed.StartContainersNumOps">rpcdetailed.rpcdetailed.StartContainersNumOps</option><option value="rpcdetailed.rpcdetailed.StopContainersAvgTime">rpcdetailed.rpcdetailed.StopContainersAvgTime</option><option value="rpcdetailed.rpcdetailed.StopContainersNumOps">rpcdetailed.rpcdetailed.StopContainersNumOps</option><option value="rpcdetailed.rpcdetailed.SubmitApplicationAvgTime">rpcdetailed.rpcdetailed.SubmitApplicationAvgTime</option><option value="rpcdetailed.rpcdetailed.SubmitApplicationNumOps">rpcdetailed.rpcdetailed.SubmitApplicationNumOps</option><option value="rpcdetailed.rpcdetailed.VersionRequestAvgTime">rpcdetailed.rpcdetailed.VersionRequestAvgTime</option><option value="rpcdetailed.rpcdetailed.VersionRequestNumOps">rpcdetailed.rpcdetailed.VersionRequestNumOps</option><option value="sample_report">sample_report</option><option value="swap_free">swap_free</option><option value="swap_total">swap_total</option><option value="ugi.UgiMetrics.GetGroupsAvgTime">ugi.UgiMetrics.GetGroupsAvgTime</option><option value="ugi.UgiMetrics.GetGroupsNumOps">ugi.UgiMetrics.GetGroupsNumOps</option><option value="ugi.UgiMetrics.LoginFailureAvgTime">ugi.UgiMetrics.LoginFailureAvgTime</option><option value="ugi.UgiMetrics.LoginFailureNumOps">ugi.UgiMetrics.LoginFailureNumOps</option><option value="ugi.UgiMetrics.LoginSuccessAvgTime">ugi.UgiMetrics.LoginSuccessAvgTime</option><option value="ugi.UgiMetrics.LoginSuccessNumOps">ugi.UgiMetrics.LoginSuccessNumOps</option><option value="varnish_report">varnish_report</option><option value="yarn.ClusterMetrics.AMLaunchDelayAvgTime">yarn.ClusterMetrics.AMLaunchDelayAvgTime</option><option value="yarn.ClusterMetrics.AMLaunchDelayNumOps">yarn.ClusterMetrics.AMLaunchDelayNumOps</option><option value="yarn.ClusterMetrics.AMRegisterDelayAvgTime">yarn.ClusterMetrics.AMRegisterDelayAvgTime</option><option value="yarn.ClusterMetrics.AMRegisterDelayNumOps">yarn.ClusterMetrics.AMRegisterDelayNumOps</option><option value="yarn.ClusterMetrics.NumActiveNMs">yarn.ClusterMetrics.NumActiveNMs</option><option value="yarn.ClusterMetrics.NumDecommissionedNMs">yarn.ClusterMetrics.NumDecommissionedNMs</option><option value="yarn.ClusterMetrics.NumDecommissioningNMs">yarn.ClusterMetrics.NumDecommissioningNMs</option><option value="yarn.ClusterMetrics.NumLostNMs">yarn.ClusterMetrics.NumLostNMs</option><option value="yarn.ClusterMetrics.NumRebootedNMs">yarn.ClusterMetrics.NumRebootedNMs</option><option value="yarn.ClusterMetrics.NumUnhealthyNMs">yarn.ClusterMetrics.NumUnhealthyNMs</option><option value="yarn.NodeManagerMetrics.AllocatedContainers">yarn.NodeManagerMetrics.AllocatedContainers</option><option value="yarn.NodeManagerMetrics.AllocatedGB">yarn.NodeManagerMetrics.AllocatedGB</option><option value="yarn.NodeManagerMetrics.AllocatedVCores">yarn.NodeManagerMetrics.AllocatedVCores</option><option value="yarn.NodeManagerMetrics.AvailableGB">yarn.NodeManagerMetrics.AvailableGB</option><option value="yarn.NodeManagerMetrics.AvailableVCores">yarn.NodeManagerMetrics.AvailableVCores</option><option value="yarn.NodeManagerMetrics.ContainerLaunchDurationAvgTime">yarn.NodeManagerMetrics.ContainerLaunchDurationAvgTime</option><option value="yarn.NodeManagerMetrics.ContainerLaunchDurationNumOps">yarn.NodeManagerMetrics.ContainerLaunchDurationNumOps</option><option value="yarn.NodeManagerMetrics.ContainersCompleted">yarn.NodeManagerMetrics.ContainersCompleted</option><option value="yarn.NodeManagerMetrics.ContainersFailed">yarn.NodeManagerMetrics.ContainersFailed</option><option value="yarn.NodeManagerMetrics.ContainersIniting">yarn.NodeManagerMetrics.ContainersIniting</option><option value="yarn.NodeManagerMetrics.ContainersKilled">yarn.NodeManagerMetrics.ContainersKilled</option><option value="yarn.NodeManagerMetrics.ContainersLaunched">yarn.NodeManagerMetrics.ContainersLaunched</option><option value="yarn.NodeManagerMetrics.ContainersRunning">yarn.NodeManagerMetrics.ContainersRunning</option><option value="yarn.QueueMetrics.ActiveApplications">yarn.QueueMetrics.ActiveApplications</option><option value="yarn.QueueMetrics.ActiveUsers">yarn.QueueMetrics.ActiveUsers</option><option value="yarn.QueueMetrics.AggregateContainersAllocated">yarn.QueueMetrics.AggregateContainersAllocated</option><option value="yarn.QueueMetrics.AggregateContainersReleased">yarn.QueueMetrics.AggregateContainersReleased</option><option value="yarn.QueueMetrics.AllocatedContainers">yarn.QueueMetrics.AllocatedContainers</option><option value="yarn.QueueMetrics.AllocatedMB">yarn.QueueMetrics.AllocatedMB</option><option value="yarn.QueueMetrics.AllocatedVCores">yarn.QueueMetrics.AllocatedVCores</option><option value="yarn.QueueMetrics.AppsCompleted">yarn.QueueMetrics.AppsCompleted</option><option value="yarn.QueueMetrics.AppsFailed">yarn.QueueMetrics.AppsFailed</option><option value="yarn.QueueMetrics.AppsKilled">yarn.QueueMetrics.AppsKilled</option><option value="yarn.QueueMetrics.AppsPending">yarn.QueueMetrics.AppsPending</option><option value="yarn.QueueMetrics.AppsRunning">yarn.QueueMetrics.AppsRunning</option><option value="yarn.QueueMetrics.AppsSubmitted">yarn.QueueMetrics.AppsSubmitted</option><option value="yarn.QueueMetrics.AvailableMB">yarn.QueueMetrics.AvailableMB</option><option value="yarn.QueueMetrics.AvailableVCores">yarn.QueueMetrics.AvailableVCores</option><option value="yarn.QueueMetrics.PendingContainers">yarn.QueueMetrics.PendingContainers</option><option value="yarn.QueueMetrics.PendingMB">yarn.QueueMetrics.PendingMB</option><option value="yarn.QueueMetrics.PendingVCores">yarn.QueueMetrics.PendingVCores</option><option value="yarn.QueueMetrics.ReservedContainers">yarn.QueueMetrics.ReservedContainers</option><option value="yarn.QueueMetrics.ReservedMB">yarn.QueueMetrics.ReservedMB</option><option value="yarn.QueueMetrics.ReservedVCores">yarn.QueueMetrics.ReservedVCores</option><option value="yarn.QueueMetrics.running_0">yarn.QueueMetrics.running_0</option><option value="yarn.QueueMetrics.running_1440">yarn.QueueMetrics.running_1440</option><option value="yarn.QueueMetrics.running_300">yarn.QueueMetrics.running_300</option><option value="yarn.QueueMetrics.running_60">yarn.QueueMetrics.running_60</option></select><div class="chosen-container chosen-container-single" style="width: 447px;" title="" id="metrics_picker_chosen"><a class="chosen-single" tabindex="-1"><span>load_one</span><div><b></b></div></a><div class="chosen-drop"><div class="chosen-search"><input type="text" autocomplete="off"></div><ul class="chosen-results"></ul></div></div>
+     
+    </div>
+    
+    <div id="show_hosts_scaled" style="display:inline;padding-left:10px;" class="ui-buttonset">Show Hosts Scaled:
+            <input type="radio" name="sh" value="2" id="shch2" onclick="ganglia_form.submit();" class="ui-helper-hidden-accessible"><label for="shch2" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left" role="button" aria-disabled="false"><span class="ui-button-text">Auto</span></label>
+            <input type="radio" name="sh" value="1" id="shch1" onclick="ganglia_form.submit();" checked="" class="ui-helper-hidden-accessible"><label for="shch1" class="ui-state-active ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Same</span></label>
+            <input type="radio" name="sh" value="0" id="shch0" onclick="ganglia_form.submit();" class="ui-helper-hidden-accessible"><label for="shch0" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">None</span></label>
+      
+    </div>
+          <div style="display:inline;padding-left:10px;" class="nobr">Size&nbsp;&nbsp;<select name="z" onchange="ganglia_form.submit();"><option value="small" selected="">small</option>
+<option value="medium">medium</option>
+<option value="large">large</option>
+<option value="xlarge">xlarge</option>
+<option value="xxlarge">xxlarge</option>
+<option value="mobile">mobile</option>
+</select>
+</div>
+      <div style="display:inline;padding-left:10px;" class="nobr">Columns&nbsp;&nbsp;<select name="hc" onchange="ganglia_form.submit();">
+<option value="0">0
+</option><option value="1">1
+</option><option value="2">2
+</option><option value="3">3
+</option><option value="4" selected="">4
+</option><option value="5">5
+</option><option value="6">6
+</option><option value="7">7
+</option><option value="8">8
+</option><option value="9">9
+</option><option value="10">10
+</option><option value="11">11
+</option><option value="12">12
+</option><option value="13">13
+</option><option value="14">14
+</option><option value="15">15
+</option><option value="16">16
+</option><option value="17">17
+</option><option value="18">18
+</option><option value="19">19
+</option><option value="20">20
+</option><option value="21">21
+</option><option value="22">22
+</option><option value="23">23
+</option><option value="24">24
+</option><option value="25">25
+</option></select>
+ (0 = metric + reports)</div>
+    
+  </div>
+  <div style="text-align:center;">
+    Show only nodes matching <input name="host_regex"><input class="header_btn ui-button ui-widget ui-state-default ui-corner-all" type="SUBMIT" value="Filter" role="button" aria-disabled="false"><div style="display:inline;padding-left:10px;" class="nobr">Max graphs to show <select onchange="ganglia_submit();" name="max_graphs"><option value="0">all</option><option>1000</option><option>500</option><option>200</option><option>100</option><option>50</option><option>25</option><option>20</option><option>15</option><option>10</option></select></div><div style="display:inline;padding-left:10px;" class="nobr"><div id="sort_menu" class="nobr ui-buttonset" style="display:inline">Sorted&nbsp;&nbsp;<input onchange="ganglia_submit();" type="radio" id="radio-ascending" name="s" value="ascending" class="ui-helper-hidden-accessible"><label title="Sort hosts by ascending metric value" for="radio-ascending" class="ui-button ui-widget ui-state-default ui-button-text-only ui-corner-left" role="button" aria-disabled="false"><span class="ui-button-text">ascending</span></label><input onchange="ganglia_submit();" type="radio" id="radio-descending" name="s" value="descending" class="ui-helper-hidden-accessible"><label title="Sort hosts by descending metric value" for="radio-descending" class="ui-button ui-widget ui-state-default ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">descending</span></label><input onchange="ganglia_submit();" type="radio" id="radio-by_name" name="s" value="by name" checked="checked" class="ui-helper-hidden-accessible"><label title="Sort hosts by name" for="radio-by_name" class="ui-state-active ui-button ui-widget ui-state-default ui-button-text-only ui-corner-right" role="button" aria-disabled="false"><span class="ui-button-text">by name</span></label></div></div>
+  </div>
+</div>
+
+<div id="host_metric_graphs">
+<center>
+<table id="graph_sorted_list">
+<tbody><tr>
+<td><div><font style="font-size: 8px">ip-172-28-17-185.ap-southeast-2.compute.internal</font><br><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?c=j-1MM0DOB1TUSN2&amp;h=ip-172-28-17-185.ap-southeast-2.compute.internal&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2"><img class="host_small_zoomable" src="./Ganglia_skew_files/graph(4).php" title="ip-172-28-17-185.ap-southeast-2.compute.internal" border="0" style="padding:2px;"></a></div></td>
+<td><div><font style="font-size: 8px">ip-172-28-22-41.ap-southeast-2.compute.internal</font><br><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?c=j-1MM0DOB1TUSN2&amp;h=ip-172-28-22-41.ap-southeast-2.compute.internal&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2"><img class="host_small_zoomable" src="./Ganglia_skew_files/graph(5).php" title="ip-172-28-22-41.ap-southeast-2.compute.internal" border="0" style="padding:2px;"></a></div></td>
+<td><div><font style="font-size: 8px">ip-172-28-49-76.ap-southeast-2.compute.internal</font><br><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?c=j-1MM0DOB1TUSN2&amp;h=ip-172-28-49-76.ap-southeast-2.compute.internal&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2"><img class="host_small_zoomable" src="./Ganglia_skew_files/graph(6).php" title="ip-172-28-49-76.ap-southeast-2.compute.internal" border="0" style="padding:2px;"></a></div></td>
+<td><div><font style="font-size: 8px">ip-172-28-203-39.ap-southeast-2.compute.internal</font><br><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?c=j-1MM0DOB1TUSN2&amp;h=ip-172-28-203-39.ap-southeast-2.compute.internal&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2"><img class="host_small_zoomable" src="./Ganglia_skew_files/graph(7).php" title="ip-172-28-203-39.ap-southeast-2.compute.internal" border="0" style="padding:2px;"></a></div></td></tr><tr>
+<td><div><font style="font-size: 8px">ip-172-28-207-11.ap-southeast-2.compute.internal</font><br><a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/?c=j-1MM0DOB1TUSN2&amp;h=ip-172-28-207-11.ap-southeast-2.compute.internal&amp;m=load_one&amp;r=hour&amp;s=by%20name&amp;hc=4&amp;mc=2"><img class="host_small_zoomable" src="./Ganglia_skew_files/graph(8).php" title="ip-172-28-207-11.ap-southeast-2.compute.internal" border="0" style="padding:2px;"></a></div></td>
+
+</tr>
+</tbody></table>
+
+
+
+
+
+<p>
+(Nodes colored by 1-minute load) | <a href="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/ganglia/node_legend.html">Legend</a>
+</p>
+
+</center>
+
+</div>
+
+<!-- End cluster_view.tpl -->
+<!-- Begin footer.tpl -->
+</form> <!-- ganglia-form -->
+</div> <!-- tabs-main -->
+
+<div id="tabs-search" aria-labelledby="ui-id-2" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+  Search term matches any number of metrics and hosts. For example type web or disk; wait a split second, and a drop down menu will show up with choices.
+  <!-- Uses LiveSearch from http://andreaslagerkvist.com/jquery/live-search/ -->
+  <div id="metric-search">
+    <form method="post" action="http://ec2-52-65-29-107.ap-southeast-2.compute.amazonaws.com/search/" onsubmit="return false;">
+      <p>
+	<label>
+	    <small>Search as you type</small><br>
+	    <input type="text" name="q" id="search-field-q" size="60" placeholder="Search as you type" on="" autocomplete="off">
+	</label>
+      </p>
+    </form>
+  </div>
+</div> 
+
+
+
+<script>
+$(function(){
+  var create_new_view_dialog = $("#create-new-view-dialog");
+  if (create_new_view_dialog[0])
+    create_new_view_dialog.dialog({
+      autoOpen: false,
+      height: "auto",
+      width: "auto",
+      modal: true,
+      position: { my: "top",
+                  at: "top+200",
+                  of: window },
+      close: function() {
+        $("#create-new-view-layer").toggle();
+        $("#create-new-view-confirmation-layer").html("");
+	newViewDialogCloseCallback();
+      }
+    });
+});
+</script>
+
+
+
+<script>
+$(function(){
+  initMetricActionsDialog();	
+});
+</script>
+
+<div id="tabs-mobile" aria-labelledby="ui-id-11" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;"></div>
+
+<div id="tabs-autorotation" aria-labelledby="ui-id-8" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+Invoke automatic rotation system. Automatic rotation rotates all of the graphs/metrics specified in a view waiting 
+30 seconds in between each. This will run as long as you have this page open.
+<p>
+Please select the view you want to rotate.</p>
+  <div id="tabs-autorotation-chooser">
+Loading view, please wait...<img src="./Ganglia_skew_files/spinner.gif">
+  </div>
+</div>
+
+<div id="tabs-livedashboard" aria-labelledby="ui-id-9" class="ui-tabs-panel ui-widget-content ui-corner-bottom" role="tabpanel" aria-expanded="false" aria-hidden="true" style="display: none;">
+Live dashboard provides you with an overview of all view metrics in a compact format. Data updates every 15 seconds.
+Only those elements that contain a metric or graph report are supported. Aggregate graphs will not be included.
+<p>
+You can get more graphs per page by using your browser zoom functionality.
+</p><p>
+Please select the view you want to view</p>
+  <div id="tabs-livedashboard-chooser">
+Loading view, please wait...<img src="./Ganglia_skew_files/spinner.gif">
+  </div>
+</div>
+
+
+<div align="center">
+<font size="-1" class="footer">
+<hr>
+Ganglia Web Frontend version 3.7.1
+<a href="http://ganglia.sourceforge.net/downloads.php?component=ganglia-webfrontend&amp;version=3.7.1">Check for Updates.</a><br>
+
+Ganglia Web Backend <i>(gmetad)</i> version 3.7.2
+<a href="http://ganglia.sourceforge.net/downloads.php?component=gmetad&amp;version=3.7.2">Check for Updates.</a><br>
+
+Downloading and parsing ganglia's XML tree took 0.0164s.<br>
+Images created with <a href="http://www.rrdtool.org/">RRDtool</a> version 1.4.8.<br>
+<a href="http://dwoo.org/">Powered by Dwoo</a> 1.1.1.<br>
+</font>
+</div>
+</div> <!-- div-tabs -->
+
+
+<script>
+$(function(){
+  $("#popup-dialog").dialog({ autoOpen: false, 
+                              width:800, 
+                              height:500,
+                              position: { my: "top",
+                                          at: "top+200",
+                                          of: window } } );
+});
+</script>
+
+<!-- End footer.tpl -->
+
+
+<div id="jquery-live-search" style="display: none;"></div><div id="ui-datepicker-div" class="ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all"></div><ul class="vakata-context"></ul><div id="jstree-marker" style="display: none;">&nbsp;</div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="edit_optional_graphs" aria-labelledby="ui-id-12" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-12" class="ui-dialog-title">&nbsp;</span><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="edit_optional_graphs" class="ui-dialog-content ui-widget-content">
+  <div style="text-align:center">
+    <button id="save_optional_graphs_button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Save</span></button>
+  </div>
+  <div id="edit_optional_graphs_content">Empty</div>
+</div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="create-new-view-dialog" style="display: none; position: absolute;" aria-labelledby="ui-id-13"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-13" class="ui-dialog-title">Create new view</span><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="create-new-view-dialog" class="ui-dialog-content ui-widget-content">
+  <div id="create-new-view-layer">
+    <form id="create_view_form">
+      <input type="hidden" name="create_view" value="1">
+      <fieldset>
+	 <label for="new_view_name">View Name</label>
+	 <input type="text" name="vn" id="new_view_name" class="text ui-widget-content ui-corner-all">
+         <center><button style="margin:10px;" onclick="createView(); return false;">Create</button></center>
+      </fieldset>
+    </form>
+  </div>
+  <div id="create-new-view-confirmation-layer"></div>
+</div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="metric-actions-dialog" aria-labelledby="ui-id-14" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-14" class="ui-dialog-title">Metric Actions</span><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="metric-actions-dialog" class="ui-dialog-content ui-widget-content">
+  <div id="metric-actions-dialog-content">
+	Available Metric actions.
+  </div>
+</div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div><div class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable" tabindex="-1" role="dialog" aria-describedby="popup-dialog" aria-labelledby="ui-id-15" style="display: none; position: absolute;"><div class="ui-dialog-titlebar ui-widget-header ui-corner-all ui-helper-clearfix"><span id="ui-id-15" class="ui-dialog-title">Inspect Graph</span><button class="ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close" role="button" aria-disabled="false" title="close"><span class="ui-button-icon-primary ui-icon ui-icon-closethick"></span><span class="ui-button-text">close</span></button></div><div id="popup-dialog" class="ui-dialog-content ui-widget-content">
+  <div id="popup-dialog-navigation"></div>
+  <div id="popup-dialog-content">
+  </div>
+</div><div class="ui-resizable-handle ui-resizable-n" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-e" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-s" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-w" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-se ui-icon ui-icon-gripsmall-diagonal-se" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-sw" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-ne" style="z-index: 90;"></div><div class="ui-resizable-handle ui-resizable-nw" style="z-index: 90;"></div></div></body></html>

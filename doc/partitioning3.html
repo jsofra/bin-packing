@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+<!-- saved from url=(0133)file:///home/jsofra/clojure-workspaces/bin-packing/doc/bin%20packing%20example%20-%20Details%20for%20Stage%201%20(Attempt%200)p3.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="./partitioning3_files/bootstrap.min.css" type="text/css"><link rel="stylesheet" href="./partitioning3_files/vis.min.css" type="text/css"><link rel="stylesheet" href="./partitioning3_files/webui.css" type="text/css"><link rel="stylesheet" href="./partitioning3_files/timeline-view.css" type="text/css"><script src="./partitioning3_files/sorttable.js"></script><script src="./partitioning3_files/jquery-1.11.1.min.js"></script><script src="./partitioning3_files/vis.min.js"></script><script src="./partitioning3_files/bootstrap-tooltip.js"></script><script src="./partitioning3_files/initialize-tooltips.js"></script><script src="./partitioning3_files/table.js"></script><script src="./partitioning3_files/additional-metrics.js"></script><script src="./partitioning3_files/timeline-view.js"></script>
+        <link rel="stylesheet" href="./partitioning3_files/spark-dag-viz.css" type="text/css"><script src="./partitioning3_files/d3.min.js"></script><script src="./partitioning3_files/dagre-d3.min.js"></script><script src="./partitioning3_files/graphlib-dot.min.js"></script><script src="./partitioning3_files/spark-dag-viz.js"></script>
+        <title>bin packing example - Details for Stage 1 (Attempt 0)</title>
+      </head>
+      <body>
+        <div class="navbar navbar-static-top">
+          <div class="navbar-inner">
+            <div class="brand">
+              <a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/" class="brand">
+                <img src="./partitioning3_files/spark-logo-77x50px-hd.png">
+                <span class="version">1.6.1</span>
+              </a>
+            </div>
+            <p class="navbar-text pull-right">
+              <strong title="bin packing example">bin packing example</strong> application UI
+            </p>
+            <ul class="nav"><li class="">
+        <a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/history/application_1466591592300_0002/1/jobs/">Jobs</a>
+      </li><li class="active">
+        <a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/history/application_1466591592300_0002/1/stages/">Stages</a>
+      </li><li class="">
+        <a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/history/application_1466591592300_0002/1/storage/">Storage</a>
+      </li><li class="">
+        <a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/history/application_1466591592300_0002/1/environment/">Environment</a>
+      </li><li class="">
+        <a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/history/application_1466591592300_0002/1/executors/">Executors</a>
+      </li></ul>
+          </div>
+        </div>
+        <div class="container-fluid">
+          <div class="row-fluid">
+            <div class="span12">
+              <h3 style="vertical-align: bottom; display: inline-block;">
+                Details for Stage 1 (Attempt 0)
+                
+              </h3>
+            </div>
+          </div>
+          <div>
+          <ul class="unstyled">
+            <li>
+              <strong>Total Time Across All Tasks: </strong>
+              3.8 h
+            </li>
+            <li>
+              <strong>Locality Level Summary: </strong>
+              Node local: 102; Process local: 114; Rack local: 12
+            </li>
+            
+            <li>
+                <strong>Output: </strong>
+                2.4 GB / 228
+              </li>
+            <li>
+                <strong>Shuffle Read: </strong>
+                600.3 KB / 228
+              </li>
+            
+            
+          </ul>
+        </div><div>
+      <span id="stage-dag-viz" class="expand-dag-viz" onclick="toggleDagViz(false);">
+        <span class="expand-dag-viz-arrow arrow-closed"></span>
+        <a data-toggle="tooltip" title="" data-placement="right" data-original-title="Shows a graph of RDD operations in this stage, and RDDs inside each one. A stage can run
+       multiple operations (e.g. two map() functions) if they can be pipelined. Some operations
+       also create multiple RDDs internally. Cached RDDs are shown in green.
+    ">
+          DAG Visualization
+        </a>
+      </span>
+      <div id="dag-viz-graph"></div>
+      <div id="dag-viz-metadata" style="display:none">
+        <div class="stage-metadata" stage-id="1" skipped="false">
+              <div class="dot-file">digraph G {
+  subgraph clusterstage_1 {
+    label="Stage 1";
+    subgraph cluster6 {
+      label="saveAsTextFile";
+      10 [label="MapPartitionsRDD [10]\nsaveAsTextFile at NativeMethodAccessorImpl.java:-2"];
+    }
+    subgraph cluster2 {
+      label="repartition";
+      6 [label="#&lt;JavaPairRDD: bin-packing.spark-example/run-analysis, spark_example.clj, L.100 [228]&gt; [6]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+      5 [label="CoalescedRDD [5]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+      4 [label="ShuffledRDD [4]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+    }
+    subgraph cluster4 {
+      label="mapValues";
+      8 [label="#&lt;JavaPairRDD: bin-packing.spark-utils/fn--718, spark_utils.clj, L.43 [bin-packing.spark-example$ebooks-tf-idf/fn--3693]&gt; [8]\nmapValues at NativeMethodAccessorImpl.java:-2"];
+    }
+    subgraph cluster2 {
+      label="repartition";
+      6 [label="#&lt;JavaPairRDD: bin-packing.spark-example/run-analysis, spark_example.clj, L.100 [228]&gt; [6]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+      5 [label="CoalescedRDD [5]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+      4 [label="ShuffledRDD [4]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+    }
+    subgraph cluster5 {
+      label="mapValues";
+      9 [label="#&lt;JavaPairRDD: bin-packing.spark-example/run-analysis, spark_example.clj, L.107 [clojure.core$partial/fn--4759]&gt; [9]\nmapValues at NativeMethodAccessorImpl.java:-2"];
+    }
+    subgraph cluster3 {
+      label="mapValues";
+      7 [label="#&lt;JavaPairRDD: bin-packing.spark-example/run-analysis, spark_example.clj, L.103 [bin-packing.gutenberg/get-ebook-texts]&gt; [7]\nmapValues at NativeMethodAccessorImpl.java:-2"];
+    }
+    subgraph cluster2 {
+      label="repartition";
+      6 [label="#&lt;JavaPairRDD: bin-packing.spark-example/run-analysis, spark_example.clj, L.100 [228]&gt; [6]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+      5 [label="CoalescedRDD [5]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+      4 [label="ShuffledRDD [4]\nrepartition at NativeMethodAccessorImpl.java:-2"];
+    }
+  }
+  9-&gt;10;
+  5-&gt;6;
+  7-&gt;8;
+  4-&gt;5;
+  8-&gt;9;
+  6-&gt;7;
+}</div>
+              <div class="incoming-edge">3,4</div>
+              
+              
+            </div>
+      </div>
+    </div><div>
+          <span class="expand-additional-metrics">
+            <span class="expand-additional-metrics-arrow arrow-closed"></span>
+            <a>Show Additional Metrics</a>
+          </span>
+          <div class="additional-metrics collapsed">
+            <ul>
+              <li>
+                  <input type="checkbox" id="select-all-metrics">
+                  <span class="additional-metric-title"><em>(De)select All</em></span>
+              </li>
+              <li>
+                <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Scheduler delay includes time to ship the task from the scheduler to
+       the executor, and time to send the task result from the executor to the scheduler. If
+       scheduler delay is large, consider decreasing the size of tasks or decreasing the size
+       of task results.">
+                  <input type="checkbox" name="scheduler_delay">
+                  <span class="additional-metric-title">Scheduler Delay</span>
+                </span>
+              </li>
+              <li>
+                <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time spent deserializing the task closure on the executor, including the time to read the
+       broadcasted task.">
+                  <input type="checkbox" name="deserialization_time">
+                  <span class="additional-metric-title">Task Deserialization Time</span>
+                </span>
+              </li>
+              <li>
+                  <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time that the task spent blocked waiting for shuffle data to be read from remote machines.">
+                    <input type="checkbox" name="fetch_wait_time">
+                    <span class="additional-metric-title">Shuffle Read Blocked Time</span>
+                  </span>
+                </li><li>
+                  <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Total shuffle bytes read from remote executors. This is a subset of the shuffle
+       read bytes; the remaining shuffle data is read locally. ">
+                    <input type="checkbox" name="shuffle_read_remote">
+                    <span class="additional-metric-title">Shuffle Remote Reads</span>
+                  </span>
+                </li>
+              <li>
+                <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time spent serializing the task result on the executor before sending it back to the
+       driver.">
+                  <input type="checkbox" name="serialization_time">
+                  <span class="additional-metric-title">Result Serialization Time</span>
+                </span>
+              </li>
+              <li>
+                <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time that the driver spends fetching task results from workers. If this is large, consider
+       decreasing the amount of data returned from each task.">
+                  <input type="checkbox" name="getting_result_time">
+                  <span class="additional-metric-title">Getting Result Time</span>
+                </span>
+              </li>
+              <li>
+                  <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Execution memory refers to the memory used by internal data structures created during
+       shuffles, aggregations and joins when Tungsten is enabled. The value of this accumulator
+       should be approximately the sum of the peak sizes across all such data structures created
+       in this task. For SQL jobs, this only tracks all unsafe operators, broadcast joins, and
+       external sort.">
+                    <input type="checkbox" name="peak_execution_memory">
+                    <span class="additional-metric-title">Peak Execution Memory</span>
+                  </span>
+                </li>
+            </ul>
+          </div>
+        </div><span class="expand-task-assignment-timeline">
+      <span class="expand-task-assignment-timeline-arrow arrow-open"></span>
+      <a>Event Timeline</a>
+    </span><div id="task-assignment-timeline" class="">
+      
+      <div class="control-panel">
+        <div id="task-assignment-timeline-zoom-lock">
+          <input type="checkbox">
+          <span>Enable zooming</span>
+        </div>
+      </div>
+      <div class="legend-area">
+      <svg>
+        <rect x="5px" y="10px" width="10px" height="10px" class="scheduler-delay-proportion"></rect><text x="25px" y="20px">Scheduler Delay</text><rect x="5px" y="25px" width="10px" height="10px" class="deserialization-time-proportion"></rect><text x="25px" y="35px">Task Deserialization Time</text><rect x="5px" y="40px" width="10px" height="10px" class="shuffle-read-time-proportion"></rect><text x="25px" y="50px">Shuffle Read Time</text><rect x="215px" y="10px" width="10px" height="10px" class="executor-runtime-proportion"></rect><text x="235px" y="20px">Executor Computing Time</text><rect x="215px" y="25px" width="10px" height="10px" class="shuffle-write-time-proportion"></rect><text x="235px" y="35px">Shuffle Write Time</text><rect x="215px" y="40px" width="10px" height="10px" class="serialization-time-proportion"></rect><text x="235px" y="50px">Result Serialization Time</text><rect x="425px" y="10px" width="10px" height="10px" class="getting-result-time-proportion"></rect><text x="445px" y="20px">Getting Result Time</text>
+      </svg>
+    </div>
+    <div class="vis timeline root bottom" style="touch-action: pan-y; -webkit-user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); height: 922px;"><div class="vispanel background" style="height: 920px; width: 1863px; left: 0px; top: 0px;"></div><div class="vispanel background vertical" style="height: 920px; width: 1515px; left: 350px; top: 0px;"><div class="axis" style="top: 880px; left: 0px;"><div class="group"></div><div class="group"></div><div class="group"></div></div><div class="timeaxis background"><div class="grid vertical minor even" style="top: -1px; left: -37.7207px; height: 903px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 74.2212px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 186.163px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 298.105px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 410.047px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 521.988px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 633.93px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 745.872px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 857.814px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 969.756px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; left: 1081.7px; height: 903px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 1193.64px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 1305.58px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 1417.52px; width: 100px;"></div></div></div><div class="vispanel background horizontal" style="height: 881px; width: 1863px; left: 0px; top: -1px;"></div><div class="vispanel center" style="touch-action: none; -webkit-user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); height: 881px; width: 1515px; left: 349px; top: -1px;"><div class="content" style="left: 0px; top: 0px;"><div class="itemset" style="height: 879px;"><div class="background"><div class="group" style="height: 0px;"><div style="visibility: hidden;">?</div></div><div class="group" style="height: 396px;"><div style="visibility: hidden;">?</div></div><div class="group" style="height: 72px;"><div style="visibility: hidden;">?</div></div><div class="group" style="height: 411px;"><div style="visibility: hidden;">?</div></div></div><div class="foreground"><div class="group" style="height: 396px;"><div class="item range task task-assignment-timeline-object" style="left: 226.259px; width: 1288.74px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 203 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:12:21 &lt;br&gt;Finish Time: 2016/06/22 11:23:51 &lt;br&gt;Scheduler Delay: 9 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 12 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.001302920278651217%"></rect> <rect class="deserialization-time-proportion" x="0.001302920278651217%" y="0px" height="26px" width="0.0011581513588010818%"></rect> <rect class="shuffle-read-time-proportion" x="0.002461071637452299%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.002461071637452299%" y="0px" height="26px" width="99.99753892836256%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 159.025px; width: 1226px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 201 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:45 &lt;br&gt;Finish Time: 2016/06/22 11:22:42 &lt;br&gt;Scheduler Delay: 13 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 11 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.0019783146281148944%"></rect> <rect class="deserialization-time-proportion" x="0.0019783146281148944%" y="0px" height="26px" width="0.0012174243865322428%"></rect> <rect class="shuffle-read-time-proportion" x="0.003195739014647137%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.003195739014647137%" y="0px" height="26px" width="99.99680426098534%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.6353px; width: 1.77428px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 222 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 15 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5772870662460567%"></rect> <rect class="deserialization-time-proportion" x="1.5772870662460567%" y="0px" height="26px" width="0.8412197686645636%"></rect> <rect class="shuffle-read-time-proportion" x="2.4185068349106205%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.4185068349106205%" y="0px" height="26px" width="97.58149316508938%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.6055px; width: 1.71084px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 220 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7448200654307526%"></rect> <rect class="deserialization-time-proportion" x="1.7448200654307526%" y="0px" height="26px" width="0.8724100327153763%"></rect> <rect class="shuffle-read-time-proportion" x="2.6172300981461287%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6172300981461287%" y="0px" height="26px" width="97.38276990185386%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.57px; width: 1.70898px; top: 293px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 219 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7467248908296942%"></rect> <rect class="deserialization-time-proportion" x="1.7467248908296942%" y="0px" height="26px" width="0.8733624454148471%"></rect> <rect class="shuffle-read-time-proportion" x="2.6200873362445414%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6200873362445414%" y="0px" height="26px" width="97.37991266375546%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.8928px; width: 1.72017px; top: 257px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 216 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 12 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5184381778741864%"></rect> <rect class="deserialization-time-proportion" x="1.5184381778741864%" y="0px" height="26px" width="1.3015184381778742%"></rect> <rect class="shuffle-read-time-proportion" x="2.8199566160520604%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.8199566160520604%" y="0px" height="26px" width="97.18004338394793%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.8573px; width: 1.7239px; top: 221px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 215 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 21 ms &lt;br&gt;Task Deserialization Time: 14 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.272727272727273%"></rect> <rect class="deserialization-time-proportion" x="2.272727272727273%" y="0px" height="26px" width="1.5151515151515151%"></rect> <rect class="shuffle-read-time-proportion" x="3.787878787878788%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.787878787878788%" y="0px" height="26px" width="96.21212121212122%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.8424px; width: 1.80226px; top: 185px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 214 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 10 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.4492753623188406%"></rect> <rect class="deserialization-time-proportion" x="1.4492753623188406%" y="0px" height="26px" width="1.0351966873706004%"></rect> <rect class="shuffle-read-time-proportion" x="2.4844720496894412%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.4844720496894412%" y="0px" height="26px" width="97.51552795031056%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.1931px; width: 1.71084px; top: 149px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 211 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7448200654307526%"></rect> <rect class="deserialization-time-proportion" x="1.7448200654307526%" y="0px" height="26px" width="0.8724100327153763%"></rect> <rect class="shuffle-read-time-proportion" x="2.6172300981461287%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6172300981461287%" y="0px" height="26px" width="97.38276990185386%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.1129px; width: 1.75935px; top: 113px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 210 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 26 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.757158006362672%"></rect> <rect class="deserialization-time-proportion" x="2.757158006362672%" y="0px" height="26px" width="1.378579003181336%"></rect> <rect class="shuffle-read-time-proportion" x="4.135737009544008%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="4.135737009544008%" y="0px" height="26px" width="95.864262990456%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.111px; width: 1.76308px; top: 77px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 209 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 34 ms &lt;br&gt;Task Deserialization Time: 12 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="3.5978835978835977%"></rect> <rect class="deserialization-time-proportion" x="3.5978835978835977%" y="0px" height="26px" width="1.2698412698412698%"></rect> <rect class="shuffle-read-time-proportion" x="4.867724867724867%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="4.867724867724867%" y="0px" height="26px" width="95.13227513227514%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 68.2472px; width: 1.88622px; top: 41px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 205 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:56 &lt;br&gt;Finish Time: 2016/06/22 11:10:57 &lt;br&gt;Scheduler Delay: 27 ms &lt;br&gt;Task Deserialization Time: 10 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.6706231454005933%"></rect> <rect class="deserialization-time-proportion" x="2.6706231454005933%" y="0px" height="26px" width="0.9891196834817012%"></rect> <rect class="shuffle-read-time-proportion" x="3.6597428288822944%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.6597428288822944%" y="0px" height="26px" width="96.3402571711177%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 44.3234px; width: 112.067px; top: 5px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 227 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:43 &lt;br&gt;Finish Time: 2016/06/22 11:11:43 &lt;br&gt;Scheduler Delay: 18 ms &lt;br&gt;Task Deserialization Time: 23 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 1 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.029966537366607288%"></rect> <rect class="deserialization-time-proportion" x="0.029966537366607288%" y="0px" height="26px" width="0.0382905755239982%"></rect> <rect class="shuffle-read-time-proportion" x="0.06825711289060549%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.06825711289060549%" y="0px" height="26px" width="99.93007807947791%"></rect> <rect class="shuffle-write-time-proportion" x="99.99833519236851%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99833519236851%" y="0px" height="26px" width="0.0016648076314781826%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 22.7317px; width: 38.3513px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 226 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:32 &lt;br&gt;Finish Time: 2016/06/22 11:10:52 &lt;br&gt;Scheduler Delay: 37 ms &lt;br&gt;Task Deserialization Time: 20 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 20 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.1799961081922553%"></rect> <rect class="deserialization-time-proportion" x="0.1799961081922553%" y="0px" height="26px" width="0.0972951936174353%"></rect> <rect class="shuffle-read-time-proportion" x="0.27729130180969064%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.27729130180969064%" y="0px" height="26px" width="99.7227086981903%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 0px; width: 44.3383px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 225 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:19 &lt;br&gt;Finish Time: 2016/06/22 11:10:43 &lt;br&gt;Scheduler Delay: 25 ms &lt;br&gt;Task Deserialization Time: 16 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 24 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.1051967178624027%"></rect> <rect class="deserialization-time-proportion" x="0.1051967178624027%" y="0px" height="26px" width="0.06732589943193772%"></rect> <rect class="shuffle-read-time-proportion" x="0.17252261729434043%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.17252261729434043%" y="0px" height="26px" width="99.82747738270567%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div></div><div class="group" style="height: 72px;"><div class="item range task task-assignment-timeline-object" style="left: 184.672px; width: 1273.76px; top: 41px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 202 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:58 &lt;br&gt;Finish Time: 2016/06/22 11:23:21 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 16 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 11 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.0020506030237606304%"></rect> <rect class="deserialization-time-proportion" x="0.0020506030237606304%" y="0px" height="26px" width="0.0023435463128692914%"></rect> <rect class="shuffle-read-time-proportion" x="0.004394149336629922%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.004394149336629922%" y="0px" height="26px" width="99.99560585066337%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 152.711px; width: 1072.14px; top: 5px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 200 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:41 &lt;br&gt;Finish Time: 2016/06/22 11:21:16 &lt;br&gt;Scheduler Delay: 20 ms &lt;br&gt;Task Deserialization Time: 16 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 9.6 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.003480318797201824%"></rect> <rect class="deserialization-time-proportion" x="0.003480318797201824%" y="0px" height="26px" width="0.002784255037761459%"></rect> <rect class="shuffle-read-time-proportion" x="0.006264573834963283%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.006264573834963283%" y="0px" height="26px" width="99.99373542616503%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div></div><div class="group" style="height: 411px;"><div class="item range task task-assignment-timeline-object" style="left: 75.0103px; width: 1.79667px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 224 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:00 &lt;br&gt;Finish Time: 2016/06/22 11:11:01 &lt;br&gt;Scheduler Delay: 17 ms &lt;br&gt;Task Deserialization Time: 7 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7653167185877467%"></rect> <rect class="deserialization-time-proportion" x="1.7653167185877467%" y="0px" height="26px" width="0.726895119418484%"></rect> <rect class="shuffle-read-time-proportion" x="2.492211838006231%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.492211838006231%" y="0px" height="26px" width="97.50778816199377%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.8461px; width: 1.80413px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 223 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.4477766287487073%"></rect> <rect class="deserialization-time-proportion" x="1.4477766287487073%" y="0px" height="26px" width="0.8273009307135472%"></rect> <rect class="shuffle-read-time-proportion" x="2.2750775594622543%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.2750775594622543%" y="0px" height="26px" width="97.72492244053774%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.6279px; width: 1.86943px; top: 293px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 221 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5968063872255487%"></rect> <rect class="deserialization-time-proportion" x="1.5968063872255487%" y="0px" height="26px" width="1.2974051896207583%"></rect> <rect class="shuffle-read-time-proportion" x="2.894211576846307%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.894211576846307%" y="0px" height="26px" width="97.10578842315368%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.0682px; width: 1.95338px; top: 257px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 218 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 24 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.292263610315186%"></rect> <rect class="deserialization-time-proportion" x="2.292263610315186%" y="0px" height="26px" width="0.7640878701050621%"></rect> <rect class="shuffle-read-time-proportion" x="3.0563514804202483%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.0563514804202483%" y="0px" height="26px" width="96.94364851957975%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 72.1073px; width: 1.75189px; top: 221px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 217 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 17 ms &lt;br&gt;Task Deserialization Time: 11 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.810436634717785%"></rect> <rect class="deserialization-time-proportion" x="1.810436634717785%" y="0px" height="26px" width="1.1714589989350372%"></rect> <rect class="shuffle-read-time-proportion" x="2.9818956336528224%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.9818956336528224%" y="0px" height="26px" width="97.01810436634717%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.7454px; width: 1.89182px; top: 185px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 213 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 21 ms &lt;br&gt;Task Deserialization Time: 12 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.0710059171597637%"></rect> <rect class="deserialization-time-proportion" x="2.0710059171597637%" y="0px" height="26px" width="1.183431952662722%"></rect> <rect class="shuffle-read-time-proportion" x="3.2544378698224854%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.2544378698224854%" y="0px" height="26px" width="96.74556213017752%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.2715px; width: 1.80786px; top: 149px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 212 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 19 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.9607843137254901%"></rect> <rect class="deserialization-time-proportion" x="1.9607843137254901%" y="0px" height="26px" width="1.3415892672858616%"></rect> <rect class="shuffle-read-time-proportion" x="3.3023735810113517%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.3023735810113517%" y="0px" height="26px" width="96.69762641898866%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.1054px; width: 2.02055px; top: 113px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 208 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 21 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.9390581717451523%"></rect> <rect class="deserialization-time-proportion" x="1.9390581717451523%" y="0px" height="26px" width="1.2003693444136658%"></rect> <rect class="shuffle-read-time-proportion" x="3.1394275161588183%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.1394275161588183%" y="0px" height="26px" width="96.8605724838412%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 69.4916px; width: 1.79107px; top: 77px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 207 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 25 ms &lt;br&gt;Task Deserialization Time: 9 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.604166666666667%"></rect> <rect class="deserialization-time-proportion" x="2.604166666666667%" y="0px" height="26px" width="0.9375%"></rect> <rect class="shuffle-read-time-proportion" x="3.541666666666667%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.541666666666667%" y="0px" height="26px" width="96.45833333333333%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 68.3125px; width: 3.44594px; top: 41px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 206 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:56 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 18 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 2 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.9745533297238765%"></rect> <rect class="deserialization-time-proportion" x="0.9745533297238765%" y="0px" height="26px" width="0.4331348132106118%"></rect> <rect class="shuffle-read-time-proportion" x="1.4076881429344883%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="1.4076881429344883%" y="0px" height="26px" width="98.59231185706551%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 68.2323px; width: 1.88622px; top: 5px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 204 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:56 &lt;br&gt;Finish Time: 2016/06/22 11:10:57 &lt;br&gt;Scheduler Delay: 17 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.6815034619188922%"></rect> <rect class="deserialization-time-proportion" x="1.6815034619188922%" y="0px" height="26px" width="0.791295746785361%"></rect> <rect class="shuffle-read-time-proportion" x="2.472799208704253%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.472799208704253%" y="0px" height="26px" width="97.52720079129574%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div></div></div></div></div><div class="shadow top" style="visibility: hidden;"></div><div class="shadow bottom" style="visibility: hidden;"></div></div><div class="vispanel left" style="height: 881px; left: 0px; top: -1px;"><div class="content" style="left: 0px; top: 0px;"><div class="labelset"><div class="vlabel" title="" style="height: 396px;"><div class="inner">1 / ip-172-28-125-157.ap-southeast-2.compute.internal</div></div><div class="vlabel" title="" style="height: 72px;"><div class="inner">2 / ip-172-28-9-165.ap-southeast-2.compute.internal</div></div><div class="vlabel" title="" style="height: 411px;"><div class="inner">3 / ip-172-28-14-194.ap-southeast-2.compute.internal</div></div></div></div><div class="shadow top" style="visibility: hidden;"></div><div class="shadow bottom" style="visibility: hidden;"></div></div><div class="vispanel right" style="height: 881px; left: 1864px; top: -1px;"><div class="content" style="left: 0px; top: 0px;"></div><div class="shadow top" style="visibility: hidden;"></div><div class="shadow bottom" style="visibility: hidden;"></div></div><div class="vispanel top" style="width: 1515px; left: 349px; top: 0px;"></div><div class="vispanel bottom" style="width: 1515px; left: 349px; top: 880px;"><div class="timeaxis foreground" style="height: 40px;"><div class="text minor measure" style="position: absolute;">0</div><div class="text major measure" style="position: absolute;">0</div><div class="text minor even" style="top: 0px; left: -37.2207px;">21:10</div><div class="text major odd" style="top: 20px; left: 0px;">Wed 22 June</div><div class="text minor odd" style="top: 0px; left: 74.7212px;">21:11</div><div class="text minor even" style="top: 0px; left: 186.663px;">21:12</div><div class="text minor odd" style="top: 0px; left: 298.605px;">21:13</div><div class="text minor even" style="top: 0px; left: 410.547px;">21:14</div><div class="text minor odd" style="top: 0px; left: 522.488px;">21:15</div><div class="text minor even" style="top: 0px; left: 634.43px;">21:16</div><div class="text minor odd" style="top: 0px; left: 746.372px;">21:17</div><div class="text minor even" style="top: 0px; left: 858.314px;">21:18</div><div class="text minor odd" style="top: 0px; left: 970.256px;">21:19</div><div class="text minor even" style="top: 0px; left: 1082.2px;">21:20</div><div class="text minor odd" style="top: 0px; left: 1194.14px;">21:21</div><div class="text minor even" style="top: 0px; left: 1306.08px;">21:22</div><div class="text minor odd" style="top: 0px; left: 1418.02px;">21:23</div></div></div></div><div class="vis timeline root bottom" style="touch-action: pan-y; -webkit-user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); height: 922px;"><div class="vispanel background" style="height: 920px; width: 1863px; left: 0px; top: 0px;"></div><div class="vispanel background vertical" style="height: 920px; width: 1515px; left: 350px; top: 0px;"><div class="axis" style="top: 880px; left: 0px;"><div class="group"></div><div class="group"></div><div class="group"></div></div><div class="timeaxis background"><div class="grid vertical minor even" style="top: -1px; height: 903px; left: -37.7207px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 74.2212px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 186.163px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 298.105px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; left: 410.047px; height: 903px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 521.988px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 633.93px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 745.872px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 857.814px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 969.756px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 1081.7px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 1193.64px; width: 111.942px;"></div><div class="grid vertical minor even" style="top: -1px; height: 903px; left: 1305.58px; width: 111.942px;"></div><div class="grid vertical minor odd" style="top: -1px; height: 903px; left: 1417.52px;"></div></div></div><div class="vispanel background horizontal" style="height: 881px; width: 1863px; left: 0px; top: -1px;"></div><div class="vispanel center" style="touch-action: none; -webkit-user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); height: 881px; width: 1515px; left: 349px; top: -1px;"><div class="content" style="left: 0px; top: 0px;"><div class="itemset" style="height: 879px;"><div class="background"><div class="group" style="height: 0px;"><div style="visibility: hidden;">?</div></div><div class="group" style="height: 396px;"><div style="visibility: hidden;">?</div></div><div class="group" style="height: 72px;"><div style="visibility: hidden;">?</div></div><div class="group" style="height: 411px;"><div style="visibility: hidden;">?</div></div></div><div class="foreground"><div class="group" style="height: 396px;"><div class="item range task task-assignment-timeline-object" style="left: 71.8424px; width: 1.80226px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 214 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 10 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.4492753623188406%"></rect> <rect class="deserialization-time-proportion" x="1.4492753623188406%" y="0px" height="26px" width="1.0351966873706004%"></rect> <rect class="shuffle-read-time-proportion" x="2.4844720496894412%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.4844720496894412%" y="0px" height="26px" width="97.51552795031056%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.1931px; width: 1.71084px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 211 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7448200654307526%"></rect> <rect class="deserialization-time-proportion" x="1.7448200654307526%" y="0px" height="26px" width="0.8724100327153763%"></rect> <rect class="shuffle-read-time-proportion" x="2.6172300981461287%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6172300981461287%" y="0px" height="26px" width="97.38276990185386%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.1129px; width: 1.75935px; top: 293px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 210 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 26 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.757158006362672%"></rect> <rect class="deserialization-time-proportion" x="2.757158006362672%" y="0px" height="26px" width="1.378579003181336%"></rect> <rect class="shuffle-read-time-proportion" x="4.135737009544008%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="4.135737009544008%" y="0px" height="26px" width="95.864262990456%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.111px; width: 1.76308px; top: 257px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 209 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 34 ms &lt;br&gt;Task Deserialization Time: 12 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="3.5978835978835977%"></rect> <rect class="deserialization-time-proportion" x="3.5978835978835977%" y="0px" height="26px" width="1.2698412698412698%"></rect> <rect class="shuffle-read-time-proportion" x="4.867724867724867%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="4.867724867724867%" y="0px" height="26px" width="95.13227513227514%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 68.2472px; width: 1.88622px; top: 221px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 205 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:56 &lt;br&gt;Finish Time: 2016/06/22 11:10:57 &lt;br&gt;Scheduler Delay: 27 ms &lt;br&gt;Task Deserialization Time: 10 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.6706231454005933%"></rect> <rect class="deserialization-time-proportion" x="2.6706231454005933%" y="0px" height="26px" width="0.9891196834817012%"></rect> <rect class="shuffle-read-time-proportion" x="3.6597428288822944%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.6597428288822944%" y="0px" height="26px" width="96.3402571711177%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 44.3234px; width: 112.067px; top: 185px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 227 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:43 &lt;br&gt;Finish Time: 2016/06/22 11:11:43 &lt;br&gt;Scheduler Delay: 18 ms &lt;br&gt;Task Deserialization Time: 23 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 1 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.029966537366607288%"></rect> <rect class="deserialization-time-proportion" x="0.029966537366607288%" y="0px" height="26px" width="0.0382905755239982%"></rect> <rect class="shuffle-read-time-proportion" x="0.06825711289060549%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.06825711289060549%" y="0px" height="26px" width="99.93007807947791%"></rect> <rect class="shuffle-write-time-proportion" x="99.99833519236851%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99833519236851%" y="0px" height="26px" width="0.0016648076314781826%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 22.7317px; width: 38.3513px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 226 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:32 &lt;br&gt;Finish Time: 2016/06/22 11:10:52 &lt;br&gt;Scheduler Delay: 37 ms &lt;br&gt;Task Deserialization Time: 20 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 20 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.1799961081922553%"></rect> <rect class="deserialization-time-proportion" x="0.1799961081922553%" y="0px" height="26px" width="0.0972951936174353%"></rect> <rect class="shuffle-read-time-proportion" x="0.27729130180969064%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.27729130180969064%" y="0px" height="26px" width="99.7227086981903%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 0px; width: 44.3383px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 225 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:19 &lt;br&gt;Finish Time: 2016/06/22 11:10:43 &lt;br&gt;Scheduler Delay: 25 ms &lt;br&gt;Task Deserialization Time: 16 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 24 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.1051967178624027%"></rect> <rect class="deserialization-time-proportion" x="0.1051967178624027%" y="0px" height="26px" width="0.06732589943193772%"></rect> <rect class="shuffle-read-time-proportion" x="0.17252261729434043%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.17252261729434043%" y="0px" height="26px" width="99.82747738270567%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.8573px; width: 1.7239px; top: 149px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 215 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 21 ms &lt;br&gt;Task Deserialization Time: 14 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.272727272727273%"></rect> <rect class="deserialization-time-proportion" x="2.272727272727273%" y="0px" height="26px" width="1.5151515151515151%"></rect> <rect class="shuffle-read-time-proportion" x="3.787878787878788%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.787878787878788%" y="0px" height="26px" width="96.21212121212122%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.8928px; width: 1.72017px; top: 113px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 216 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 12 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5184381778741864%"></rect> <rect class="deserialization-time-proportion" x="1.5184381778741864%" y="0px" height="26px" width="1.3015184381778742%"></rect> <rect class="shuffle-read-time-proportion" x="2.8199566160520604%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.8199566160520604%" y="0px" height="26px" width="97.18004338394793%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.57px; width: 1.70898px; top: 77px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 219 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7467248908296942%"></rect> <rect class="deserialization-time-proportion" x="1.7467248908296942%" y="0px" height="26px" width="0.8733624454148471%"></rect> <rect class="shuffle-read-time-proportion" x="2.6200873362445414%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6200873362445414%" y="0px" height="26px" width="97.37991266375546%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.6055px; width: 1.71084px; top: 41px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 220 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7448200654307526%"></rect> <rect class="deserialization-time-proportion" x="1.7448200654307526%" y="0px" height="26px" width="0.8724100327153763%"></rect> <rect class="shuffle-read-time-proportion" x="2.6172300981461287%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6172300981461287%" y="0px" height="26px" width="97.38276990185386%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.6353px; width: 1.77428px; top: 5px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 222 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 15 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5772870662460567%"></rect> <rect class="deserialization-time-proportion" x="1.5772870662460567%" y="0px" height="26px" width="0.8412197686645636%"></rect> <rect class="shuffle-read-time-proportion" x="2.4185068349106205%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.4185068349106205%" y="0px" height="26px" width="97.58149316508938%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 159.025px; width: 1226px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 201 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:45 &lt;br&gt;Finish Time: 2016/06/22 11:22:42 &lt;br&gt;Scheduler Delay: 13 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 11 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.0019783146281148944%"></rect> <rect class="deserialization-time-proportion" x="0.0019783146281148944%" y="0px" height="26px" width="0.0012174243865322428%"></rect> <rect class="shuffle-read-time-proportion" x="0.003195739014647137%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.003195739014647137%" y="0px" height="26px" width="99.99680426098534%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 226.259px; width: 1288.74px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 203 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:12:21 &lt;br&gt;Finish Time: 2016/06/22 11:23:51 &lt;br&gt;Scheduler Delay: 9 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 12 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.001302920278651217%"></rect> <rect class="deserialization-time-proportion" x="0.001302920278651217%" y="0px" height="26px" width="0.0011581513588010818%"></rect> <rect class="shuffle-read-time-proportion" x="0.002461071637452299%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.002461071637452299%" y="0px" height="26px" width="99.99753892836256%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div></div><div class="group" style="height: 72px;"><div class="item range task task-assignment-timeline-object" style="left: 152.711px; width: 1072.14px; top: 41px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 200 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:41 &lt;br&gt;Finish Time: 2016/06/22 11:21:16 &lt;br&gt;Scheduler Delay: 20 ms &lt;br&gt;Task Deserialization Time: 16 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 9.6 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.003480318797201824%"></rect> <rect class="deserialization-time-proportion" x="0.003480318797201824%" y="0px" height="26px" width="0.002784255037761459%"></rect> <rect class="shuffle-read-time-proportion" x="0.006264573834963283%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.006264573834963283%" y="0px" height="26px" width="99.99373542616503%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 184.672px; width: 1273.76px; top: 5px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 202 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:58 &lt;br&gt;Finish Time: 2016/06/22 11:23:21 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 16 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 11 min &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.0020506030237606304%"></rect> <rect class="deserialization-time-proportion" x="0.0020506030237606304%" y="0px" height="26px" width="0.0023435463128692914%"></rect> <rect class="shuffle-read-time-proportion" x="0.004394149336629922%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.004394149336629922%" y="0px" height="26px" width="99.99560585066337%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div></div><div class="group" style="height: 411px;"><div class="item range task task-assignment-timeline-object" style="left: 71.7454px; width: 1.89182px; top: 365px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 213 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 21 ms &lt;br&gt;Task Deserialization Time: 12 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.0710059171597637%"></rect> <rect class="deserialization-time-proportion" x="2.0710059171597637%" y="0px" height="26px" width="1.183431952662722%"></rect> <rect class="shuffle-read-time-proportion" x="3.2544378698224854%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.2544378698224854%" y="0px" height="26px" width="96.74556213017752%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 71.2715px; width: 1.80786px; top: 329px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 212 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 19 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.9607843137254901%"></rect> <rect class="deserialization-time-proportion" x="1.9607843137254901%" y="0px" height="26px" width="1.3415892672858616%"></rect> <rect class="shuffle-read-time-proportion" x="3.3023735810113517%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.3023735810113517%" y="0px" height="26px" width="96.69762641898866%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 70.1054px; width: 2.02055px; top: 293px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 208 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 21 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.9390581717451523%"></rect> <rect class="deserialization-time-proportion" x="1.9390581717451523%" y="0px" height="26px" width="1.2003693444136658%"></rect> <rect class="shuffle-read-time-proportion" x="3.1394275161588183%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.1394275161588183%" y="0px" height="26px" width="96.8605724838412%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 69.4916px; width: 1.79107px; top: 257px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 207 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:57 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 25 ms &lt;br&gt;Task Deserialization Time: 9 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.604166666666667%"></rect> <rect class="deserialization-time-proportion" x="2.604166666666667%" y="0px" height="26px" width="0.9375%"></rect> <rect class="shuffle-read-time-proportion" x="3.541666666666667%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.541666666666667%" y="0px" height="26px" width="96.45833333333333%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 68.3125px; width: 3.44594px; top: 221px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 206 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:56 &lt;br&gt;Finish Time: 2016/06/22 11:10:58 &lt;br&gt;Scheduler Delay: 18 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 2 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.9745533297238765%"></rect> <rect class="deserialization-time-proportion" x="0.9745533297238765%" y="0px" height="26px" width="0.4331348132106118%"></rect> <rect class="shuffle-read-time-proportion" x="1.4076881429344883%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="1.4076881429344883%" y="0px" height="26px" width="98.59231185706551%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 68.2323px; width: 1.88622px; top: 185px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 204 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:56 &lt;br&gt;Finish Time: 2016/06/22 11:10:57 &lt;br&gt;Scheduler Delay: 17 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.6815034619188922%"></rect> <rect class="deserialization-time-proportion" x="1.6815034619188922%" y="0px" height="26px" width="0.791295746785361%"></rect> <rect class="shuffle-read-time-proportion" x="2.472799208704253%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.472799208704253%" y="0px" height="26px" width="97.52720079129574%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 72.1073px; width: 1.75189px; top: 149px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 217 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:58 &lt;br&gt;Finish Time: 2016/06/22 11:10:59 &lt;br&gt;Scheduler Delay: 17 ms &lt;br&gt;Task Deserialization Time: 11 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.810436634717785%"></rect> <rect class="deserialization-time-proportion" x="1.810436634717785%" y="0px" height="26px" width="1.1714589989350372%"></rect> <rect class="shuffle-read-time-proportion" x="2.9818956336528224%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.9818956336528224%" y="0px" height="26px" width="97.01810436634717%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.0682px; width: 1.95338px; top: 113px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 218 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 24 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.292263610315186%"></rect> <rect class="deserialization-time-proportion" x="2.292263610315186%" y="0px" height="26px" width="0.7640878701050621%"></rect> <rect class="shuffle-read-time-proportion" x="3.0563514804202483%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.0563514804202483%" y="0px" height="26px" width="96.94364851957975%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.6279px; width: 1.86943px; top: 77px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 221 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 16 ms &lt;br&gt;Task Deserialization Time: 13 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 1.0 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5968063872255487%"></rect> <rect class="deserialization-time-proportion" x="1.5968063872255487%" y="0px" height="26px" width="1.2974051896207583%"></rect> <rect class="shuffle-read-time-proportion" x="2.894211576846307%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.894211576846307%" y="0px" height="26px" width="97.10578842315368%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 73.8461px; width: 1.80413px; top: 41px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 223 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:10:59 &lt;br&gt;Finish Time: 2016/06/22 11:11:00 &lt;br&gt;Scheduler Delay: 14 ms &lt;br&gt;Task Deserialization Time: 8 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.4477766287487073%"></rect> <rect class="deserialization-time-proportion" x="1.4477766287487073%" y="0px" height="26px" width="0.8273009307135472%"></rect> <rect class="shuffle-read-time-proportion" x="2.2750775594622543%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.2750775594622543%" y="0px" height="26px" width="97.72492244053774%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div><div class="item range task task-assignment-timeline-object" style="left: 75.0103px; width: 1.79667px; top: 5px;"><div class="content" style="left: 0px;"><div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 224 (attempt 0)&lt;br&gt; Status: SUCCESS&lt;br&gt; Launch Time: 2016/06/22 11:11:00 &lt;br&gt;Finish Time: 2016/06/22 11:11:01 &lt;br&gt;Scheduler Delay: 17 ms &lt;br&gt;Task Deserialization Time: 7 ms &lt;br&gt;Shuffle Read Time: 0 ms &lt;br&gt;Executor Computing Time: 0.9 s &lt;br&gt;Shuffle Write Time: 0 ms &lt;br&gt;Result Serialization Time: 0 ms &lt;br&gt;Getting Result Time: 0 ms" data-original-title="" title=""> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7653167185877467%"></rect> <rect class="deserialization-time-proportion" x="1.7653167185877467%" y="0px" height="26px" width="0.726895119418484%"></rect> <rect class="shuffle-read-time-proportion" x="2.492211838006231%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.492211838006231%" y="0px" height="26px" width="97.50778816199377%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg></div></div></div></div></div></div></div><div class="shadow top" style="visibility: hidden;"></div><div class="shadow bottom" style="visibility: hidden;"></div></div><div class="vispanel left" style="height: 881px; left: 0px; top: -1px;"><div class="content" style="left: 0px; top: 0px;"><div class="labelset"><div class="vlabel" title="" style="height: 396px;"><div class="inner">1 / ip-172-28-125-157.ap-southeast-2.compute.internal</div></div><div class="vlabel" title="" style="height: 72px;"><div class="inner">2 / ip-172-28-9-165.ap-southeast-2.compute.internal</div></div><div class="vlabel" title="" style="height: 411px;"><div class="inner">3 / ip-172-28-14-194.ap-southeast-2.compute.internal</div></div></div></div><div class="shadow top" style="visibility: hidden;"></div><div class="shadow bottom" style="visibility: hidden;"></div></div><div class="vispanel right" style="height: 881px; left: 1864px; top: -1px;"><div class="content" style="left: 0px; top: 0px;"></div><div class="shadow top" style="visibility: hidden;"></div><div class="shadow bottom" style="visibility: hidden;"></div></div><div class="vispanel top" style="width: 1515px; left: 349px; top: 0px;"></div><div class="vispanel bottom" style="width: 1515px; left: 349px; top: 880px;"><div class="timeaxis foreground" style="height: 40px;"><div class="text minor measure" style="position: absolute;">0</div><div class="text major measure" style="position: absolute;">0</div><div class="text minor even" style="top: 0px; left: -37.2207px;">21:10</div><div class="text minor odd" style="top: 0px; left: 74.7212px;">21:11</div><div class="text minor even" style="top: 0px; left: 186.663px;">21:12</div><div class="text minor odd" style="top: 0px; left: 298.605px;">21:13</div><div class="text minor even" style="top: 0px; left: 410.547px;">21:14</div><div class="text major odd" style="top: 20px; left: 0px;">Wed 22 June</div><div class="text minor odd" style="top: 0px; left: 522.488px;">21:15</div><div class="text minor even" style="top: 0px; left: 634.43px;">21:16</div><div class="text minor odd" style="top: 0px; left: 746.372px;">21:17</div><div class="text minor even" style="top: 0px; left: 858.314px;">21:18</div><div class="text minor odd" style="top: 0px; left: 970.256px;">21:19</div><div class="text minor even" style="top: 0px; left: 1082.2px;">21:20</div><div class="text minor odd" style="top: 0px; left: 1194.14px;">21:21</div><div class="text minor even" style="top: 0px; left: 1306.08px;">21:22</div><div class="text minor odd" style="top: 0px; left: 1418.02px;">21:23</div></div></div></div></div><script type="text/javascript">
+      drawTaskAssignmentTimeline([
+            {
+              'id': '2',
+              'content': '2 / ip-172-28-9-165.ap-southeast-2.compute.internal',
+            }
+          ,
+            {
+              'id': '3',
+              'content': '3 / ip-172-28-14-194.ap-southeast-2.compute.internal',
+            }
+          ,
+            {
+              'id': '1',
+              'content': '1 / ip-172-28-125-157.ap-southeast-2.compute.internal',
+            }
+          ], [ { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 203 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:12:21 <br>Finish Time: 2016/06/22 11:23:51 <br>Scheduler Delay: 9 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 12 min <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.001302920278651217%"></rect> <rect class="deserialization-time-proportion" x="0.001302920278651217%" y="0px" height="26px" width="0.0011581513588010818%"></rect> <rect class="shuffle-read-time-proportion" x="0.002461071637452299%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.002461071637452299%" y="0px" height="26px" width="99.99753892836256%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593941223), 'end': new Date(1466594631979) } , { 'className': 'task task-assignment-timeline-object', 'group': '2', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 202 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:11:58 <br>Finish Time: 2016/06/22 11:23:21 <br>Scheduler Delay: 14 ms <br>Task Deserialization Time: 16 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 11 min <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.0020506030237606304%"></rect> <rect class="deserialization-time-proportion" x="0.0020506030237606304%" y="0px" height="26px" width="0.0023435463128692914%"></rect> <rect class="shuffle-read-time-proportion" x="0.004394149336629922%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.004394149336629922%" y="0px" height="26px" width="99.99560585066337%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593918933), 'end': new Date(1466594601659) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 201 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:11:45 <br>Finish Time: 2016/06/22 11:22:42 <br>Scheduler Delay: 13 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 11 min <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.0019783146281148944%"></rect> <rect class="deserialization-time-proportion" x="0.0019783146281148944%" y="0px" height="26px" width="0.0012174243865322428%"></rect> <rect class="shuffle-read-time-proportion" x="0.003195739014647137%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.003195739014647137%" y="0px" height="26px" width="99.99680426098534%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593905186), 'end': new Date(1466594562311) } , { 'className': 'task task-assignment-timeline-object', 'group': '2', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 200 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:11:41 <br>Finish Time: 2016/06/22 11:21:16 <br>Scheduler Delay: 20 ms <br>Task Deserialization Time: 16 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 9.6 min <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.003480318797201824%"></rect> <rect class="deserialization-time-proportion" x="0.003480318797201824%" y="0px" height="26px" width="0.002784255037761459%"></rect> <rect class="shuffle-read-time-proportion" x="0.006264573834963283%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.006264573834963283%" y="0px" height="26px" width="99.99373542616503%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593901802), 'end': new Date(1466594476462) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 224 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:11:00 <br>Finish Time: 2016/06/22 11:11:01 <br>Scheduler Delay: 17 ms <br>Task Deserialization Time: 7 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7653167185877467%"></rect> <rect class="deserialization-time-proportion" x="1.7653167185877467%" y="0px" height="26px" width="0.726895119418484%"></rect> <rect class="shuffle-read-time-proportion" x="2.492211838006231%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.492211838006231%" y="0px" height="26px" width="97.50778816199377%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593860155), 'end': new Date(1466593861118) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 223 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:59 <br>Finish Time: 2016/06/22 11:11:00 <br>Scheduler Delay: 14 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.4477766287487073%"></rect> <rect class="deserialization-time-proportion" x="1.4477766287487073%" y="0px" height="26px" width="0.8273009307135472%"></rect> <rect class="shuffle-read-time-proportion" x="2.2750775594622543%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.2750775594622543%" y="0px" height="26px" width="97.72492244053774%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593859531), 'end': new Date(1466593860498) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 222 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:59 <br>Finish Time: 2016/06/22 11:11:00 <br>Scheduler Delay: 15 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5772870662460567%"></rect> <rect class="deserialization-time-proportion" x="1.5772870662460567%" y="0px" height="26px" width="0.8412197686645636%"></rect> <rect class="shuffle-read-time-proportion" x="2.4185068349106205%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.4185068349106205%" y="0px" height="26px" width="97.58149316508938%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593859418), 'end': new Date(1466593860369) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 221 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:59 <br>Finish Time: 2016/06/22 11:11:00 <br>Scheduler Delay: 16 ms <br>Task Deserialization Time: 13 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1.0 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5968063872255487%"></rect> <rect class="deserialization-time-proportion" x="1.5968063872255487%" y="0px" height="26px" width="1.2974051896207583%"></rect> <rect class="shuffle-read-time-proportion" x="2.894211576846307%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.894211576846307%" y="0px" height="26px" width="97.10578842315368%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593859414), 'end': new Date(1466593860416) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 220 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:59 <br>Finish Time: 2016/06/22 11:11:00 <br>Scheduler Delay: 16 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7448200654307526%"></rect> <rect class="deserialization-time-proportion" x="1.7448200654307526%" y="0px" height="26px" width="0.8724100327153763%"></rect> <rect class="shuffle-read-time-proportion" x="2.6172300981461287%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6172300981461287%" y="0px" height="26px" width="97.38276990185386%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593859402), 'end': new Date(1466593860319) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 219 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:59 <br>Finish Time: 2016/06/22 11:11:00 <br>Scheduler Delay: 16 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7467248908296942%"></rect> <rect class="deserialization-time-proportion" x="1.7467248908296942%" y="0px" height="26px" width="0.8733624454148471%"></rect> <rect class="shuffle-read-time-proportion" x="2.6200873362445414%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6200873362445414%" y="0px" height="26px" width="97.37991266375546%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593859383), 'end': new Date(1466593860299) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 218 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:59 <br>Finish Time: 2016/06/22 11:11:00 <br>Scheduler Delay: 24 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.292263610315186%"></rect> <rect class="deserialization-time-proportion" x="2.292263610315186%" y="0px" height="26px" width="0.7640878701050621%"></rect> <rect class="shuffle-read-time-proportion" x="3.0563514804202483%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.0563514804202483%" y="0px" height="26px" width="96.94364851957975%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593859114), 'end': new Date(1466593860161) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 217 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:58 <br>Finish Time: 2016/06/22 11:10:59 <br>Scheduler Delay: 17 ms <br>Task Deserialization Time: 11 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.810436634717785%"></rect> <rect class="deserialization-time-proportion" x="1.810436634717785%" y="0px" height="26px" width="1.1714589989350372%"></rect> <rect class="shuffle-read-time-proportion" x="2.9818956336528224%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.9818956336528224%" y="0px" height="26px" width="97.01810436634717%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593858599), 'end': new Date(1466593859538) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 216 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:58 <br>Finish Time: 2016/06/22 11:10:59 <br>Scheduler Delay: 14 ms <br>Task Deserialization Time: 12 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.5184381778741864%"></rect> <rect class="deserialization-time-proportion" x="1.5184381778741864%" y="0px" height="26px" width="1.3015184381778742%"></rect> <rect class="shuffle-read-time-proportion" x="2.8199566160520604%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.8199566160520604%" y="0px" height="26px" width="97.18004338394793%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593858484), 'end': new Date(1466593859406) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 215 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:58 <br>Finish Time: 2016/06/22 11:10:59 <br>Scheduler Delay: 21 ms <br>Task Deserialization Time: 14 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.272727272727273%"></rect> <rect class="deserialization-time-proportion" x="2.272727272727273%" y="0px" height="26px" width="1.5151515151515151%"></rect> <rect class="shuffle-read-time-proportion" x="3.787878787878788%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.787878787878788%" y="0px" height="26px" width="96.21212121212122%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593858465), 'end': new Date(1466593859389) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 214 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:58 <br>Finish Time: 2016/06/22 11:10:59 <br>Scheduler Delay: 14 ms <br>Task Deserialization Time: 10 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.4492753623188406%"></rect> <rect class="deserialization-time-proportion" x="1.4492753623188406%" y="0px" height="26px" width="1.0351966873706004%"></rect> <rect class="shuffle-read-time-proportion" x="2.4844720496894412%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.4844720496894412%" y="0px" height="26px" width="97.51552795031056%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593858457), 'end': new Date(1466593859423) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 213 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:58 <br>Finish Time: 2016/06/22 11:10:59 <br>Scheduler Delay: 21 ms <br>Task Deserialization Time: 12 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1.0 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.0710059171597637%"></rect> <rect class="deserialization-time-proportion" x="2.0710059171597637%" y="0px" height="26px" width="1.183431952662722%"></rect> <rect class="shuffle-read-time-proportion" x="3.2544378698224854%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.2544378698224854%" y="0px" height="26px" width="96.74556213017752%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593858405), 'end': new Date(1466593859419) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 212 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:58 <br>Finish Time: 2016/06/22 11:10:59 <br>Scheduler Delay: 19 ms <br>Task Deserialization Time: 13 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.9607843137254901%"></rect> <rect class="deserialization-time-proportion" x="1.9607843137254901%" y="0px" height="26px" width="1.3415892672858616%"></rect> <rect class="shuffle-read-time-proportion" x="3.3023735810113517%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.3023735810113517%" y="0px" height="26px" width="96.69762641898866%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593858151), 'end': new Date(1466593859120) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 211 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:57 <br>Finish Time: 2016/06/22 11:10:58 <br>Scheduler Delay: 16 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.7448200654307526%"></rect> <rect class="deserialization-time-proportion" x="1.7448200654307526%" y="0px" height="26px" width="0.8724100327153763%"></rect> <rect class="shuffle-read-time-proportion" x="2.6172300981461287%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.6172300981461287%" y="0px" height="26px" width="97.38276990185386%"></rect> <rect class="shuffle-write-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="99.99999999999999%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593857573), 'end': new Date(1466593858490) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 210 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:57 <br>Finish Time: 2016/06/22 11:10:58 <br>Scheduler Delay: 26 ms <br>Task Deserialization Time: 13 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.757158006362672%"></rect> <rect class="deserialization-time-proportion" x="2.757158006362672%" y="0px" height="26px" width="1.378579003181336%"></rect> <rect class="shuffle-read-time-proportion" x="4.135737009544008%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="4.135737009544008%" y="0px" height="26px" width="95.864262990456%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593857530), 'end': new Date(1466593858473) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 209 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:57 <br>Finish Time: 2016/06/22 11:10:58 <br>Scheduler Delay: 34 ms <br>Task Deserialization Time: 12 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="3.5978835978835977%"></rect> <rect class="deserialization-time-proportion" x="3.5978835978835977%" y="0px" height="26px" width="1.2698412698412698%"></rect> <rect class="shuffle-read-time-proportion" x="4.867724867724867%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="4.867724867724867%" y="0px" height="26px" width="95.13227513227514%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593857529), 'end': new Date(1466593858474) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 208 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:57 <br>Finish Time: 2016/06/22 11:10:58 <br>Scheduler Delay: 21 ms <br>Task Deserialization Time: 13 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.9390581717451523%"></rect> <rect class="deserialization-time-proportion" x="1.9390581717451523%" y="0px" height="26px" width="1.2003693444136658%"></rect> <rect class="shuffle-read-time-proportion" x="3.1394275161588183%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.1394275161588183%" y="0px" height="26px" width="96.8605724838412%"></rect> <rect class="shuffle-write-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.00000000000001%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593857526), 'end': new Date(1466593858609) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 207 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:57 <br>Finish Time: 2016/06/22 11:10:58 <br>Scheduler Delay: 25 ms <br>Task Deserialization Time: 9 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 0.9 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.604166666666667%"></rect> <rect class="deserialization-time-proportion" x="2.604166666666667%" y="0px" height="26px" width="0.9375%"></rect> <rect class="shuffle-read-time-proportion" x="3.541666666666667%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.541666666666667%" y="0px" height="26px" width="96.45833333333333%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593857197), 'end': new Date(1466593858157) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 206 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:56 <br>Finish Time: 2016/06/22 11:10:58 <br>Scheduler Delay: 18 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 2 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.9745533297238765%"></rect> <rect class="deserialization-time-proportion" x="0.9745533297238765%" y="0px" height="26px" width="0.4331348132106118%"></rect> <rect class="shuffle-read-time-proportion" x="1.4076881429344883%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="1.4076881429344883%" y="0px" height="26px" width="98.59231185706551%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593856565), 'end': new Date(1466593858412) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 205 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:56 <br>Finish Time: 2016/06/22 11:10:57 <br>Scheduler Delay: 27 ms <br>Task Deserialization Time: 10 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1.0 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="2.6706231454005933%"></rect> <rect class="deserialization-time-proportion" x="2.6706231454005933%" y="0px" height="26px" width="0.9891196834817012%"></rect> <rect class="shuffle-read-time-proportion" x="3.6597428288822944%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="3.6597428288822944%" y="0px" height="26px" width="96.3402571711177%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593856530), 'end': new Date(1466593857541) } , { 'className': 'task task-assignment-timeline-object', 'group': '3', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 204 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:56 <br>Finish Time: 2016/06/22 11:10:57 <br>Scheduler Delay: 17 ms <br>Task Deserialization Time: 8 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1.0 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="1.6815034619188922%"></rect> <rect class="deserialization-time-proportion" x="1.6815034619188922%" y="0px" height="26px" width="0.791295746785361%"></rect> <rect class="shuffle-read-time-proportion" x="2.472799208704253%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="2.472799208704253%" y="0px" height="26px" width="97.52720079129574%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593856522), 'end': new Date(1466593857533) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 227 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:43 <br>Finish Time: 2016/06/22 11:11:43 <br>Scheduler Delay: 18 ms <br>Task Deserialization Time: 23 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 1.0 min <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 1 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.029966537366607288%"></rect> <rect class="deserialization-time-proportion" x="0.029966537366607288%" y="0px" height="26px" width="0.0382905755239982%"></rect> <rect class="shuffle-read-time-proportion" x="0.06825711289060549%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.06825711289060549%" y="0px" height="26px" width="99.93007807947791%"></rect> <rect class="shuffle-write-time-proportion" x="99.99833519236851%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="99.99833519236851%" y="0px" height="26px" width="0.0016648076314781826%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593843707), 'end': new Date(1466593903774) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 226 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:32 <br>Finish Time: 2016/06/22 11:10:52 <br>Scheduler Delay: 37 ms <br>Task Deserialization Time: 20 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 20 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.1799961081922553%"></rect> <rect class="deserialization-time-proportion" x="0.1799961081922553%" y="0px" height="26px" width="0.0972951936174353%"></rect> <rect class="shuffle-read-time-proportion" x="0.27729130180969064%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.27729130180969064%" y="0px" height="26px" width="99.7227086981903%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593832134), 'end': new Date(1466593852690) } , { 'className': 'task task-assignment-timeline-object', 'group': '1', 'content': '<div class="task-assignment-timeline-content" data-toggle="tooltip" data-placement="top" data-html="true" data-container="body" data-title="Task 225 (attempt 0)<br> Status: SUCCESS<br> Launch Time: 2016/06/22 11:10:19 <br>Finish Time: 2016/06/22 11:10:43 <br>Scheduler Delay: 25 ms <br>Task Deserialization Time: 16 ms <br>Shuffle Read Time: 0 ms <br>Executor Computing Time: 24 s <br>Shuffle Write Time: 0 ms <br>Result Serialization Time: 0 ms <br>Getting Result Time: 0 ms"> <svg class="task-assignment-timeline-duration-bar"> <rect class="scheduler-delay-proportion" x="0%" y="0px" height="26px" width="0.1051967178624027%"></rect> <rect class="deserialization-time-proportion" x="0.1051967178624027%" y="0px" height="26px" width="0.06732589943193772%"></rect> <rect class="shuffle-read-time-proportion" x="0.17252261729434043%" y="0px" height="26px" width="0.0%"></rect> <rect class="executor-runtime-proportion" x="0.17252261729434043%" y="0px" height="26px" width="99.82747738270567%"></rect> <rect class="shuffle-write-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="serialization-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect> <rect class="getting-result-time-proportion" x="100.0%" y="0px" height="26px" width="0.0%"></rect></svg>', 'start': new Date(1466593819950), 'end': new Date(1466593843715) } ], 1466593819950, 1466594631979)
+    </script><h4>Summary Metrics for 228 Completed Tasks</h4><div><table class="table table-bordered table-condensed sortable" id="task-summary-table">
+      <thead><tr style="background-color: rgb(255, 255, 255);"><th width="16.666666666666668%" class="">Metric</th><th width="16.666666666666668%" class="">Min</th><th width="16.666666666666668%" class="">25th percentile</th><th width="16.666666666666668%" class="">Median</th><th width="16.666666666666668%" class="">75th percentile</th><th width="16.666666666666668%" class="">Max</th></tr></thead>
+      <tbody>
+        <tr style="background-color: rgb(249, 249, 249);"><td>Duration</td><td>0.9 s</td><td>1.0 s</td><td>4 s</td><td>1.3 min</td><td>12 min</td></tr><tr class="scheduler_delay"><td><span data-toggle="tooltip" title="" data-placement="right" data-original-title="Scheduler delay includes time to ship the task from the scheduler to
+       the executor, and time to send the task result from the executor to the scheduler. If
+       scheduler delay is large, consider decreasing the size of tasks or decreasing the size
+       of task results.">Scheduler Delay</span></td><td>9 ms</td><td>18 ms</td><td>21 ms</td><td>25 ms</td><td>98 ms</td></tr><tr class="deserialization_time">
+              <td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time spent deserializing the task closure on the executor, including the time to read the
+       broadcasted task.">
+                Task Deserialization Time
+              </span>
+            </td><td>7 ms</td><td>12 ms</td><td>15 ms</td><td>24 ms</td><td>0.2 s</td>
+            </tr><tr style="background-color: rgb(255, 255, 255);"><td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time that the executor spent paused for Java garbage collection while the task was
+       running.">GC Time
+              </span>
+            </td><td>0 ms</td><td>90 ms</td><td>0.3 s</td><td>6 s</td><td>47 s</td></tr><tr class="serialization_time">
+              <td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time spent serializing the task result on the executor before sending it back to the
+       driver.">
+                Result Serialization Time
+              </span>
+            </td><td>0 ms</td><td>0 ms</td><td>0 ms</td><td>0 ms</td><td>1 ms</td>
+            </tr><tr class="getting_result_time"><td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time that the driver spends fetching task results from workers. If this is large, consider
+       decreasing the amount of data returned from each task.">
+                Getting Result Time
+              </span>
+            </td><td>0 ms</td><td>0 ms</td><td>0 ms</td><td>0 ms</td><td>0 ms</td></tr><tr class="peak_execution_memory">
+                <td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Execution memory refers to the memory used by internal data structures created during
+       shuffles, aggregations and joins when Tungsten is enabled. The value of this accumulator
+       should be approximately the sum of the peak sizes across all such data structures created
+       in this task. For SQL jobs, this only tracks all unsafe operators, broadcast joins, and
+       external sort.">
+                Peak Execution Memory
+              </span>
+            </td><td>0.0 B</td><td>0.0 B</td><td>0.0 B</td><td>0.0 B</td><td>0.0 B</td>
+              </tr><tr style="background-color: rgb(249, 249, 249);"><td>Output Size / Records</td><td>0.0 B / 0</td><td>0.0 B / 0</td><td>537.8 KB / 1</td><td>12.8 MB / 2</td><td>123.6 MB / 3</td></tr><tr class="fetch_wait_time">
+                <td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Time that the task spent blocked waiting for shuffle data to be read from remote machines.">
+                Shuffle Read Blocked Time
+              </span>
+            </td><td>0 ms</td><td>0 ms</td><td>0 ms</td><td>0 ms</td><td>1 ms</td>
+              </tr><tr style="background-color: rgb(255, 255, 255);"><td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Total shuffle bytes and records read (includes both data read locally and data read from
+       remote executors). ">
+                Shuffle Read Size / Records
+              </span>
+            </td><td>0.0 B / 0</td><td>0.0 B / 0</td><td>428.0 B / 1</td><td>3.4 KB / 2</td><td>46.9 KB / 3</td></tr><tr class="shuffle_read_remote">
+                <td>
+              <span data-toggle="tooltip" title="" data-placement="right" data-original-title="Total shuffle bytes read from remote executors. This is a subset of the shuffle
+       read bytes; the remaining shuffle data is read locally. ">
+                Shuffle Remote Reads
+              </span>
+            </td><td>0.0 B</td><td>0.0 B</td><td>0.0 B</td><td>605.0 B</td><td>46.9 KB</td>
+              </tr>
+      </tbody>
+    <tfoot></tfoot></table></div><h4>Aggregated Metrics by Executor</h4><table class="table table-bordered table-condensed table-striped sortable">
+      <thead>
+        <tr><th id="executorid" class=" sorttable_sorted_reverse">Executor ID<span id="sorttable_sortrevind">&nbsp;▾</span></th>
+        <th class="">Address</th>
+        <th class="">Task Time</th>
+        <th class="">Total Tasks</th>
+        <th class="">Failed Tasks</th>
+        <th class="">Succeeded Tasks</th>
+        
+        <th class="">
+            <span data-toggle="tooltip" title="" data-original-title="Bytes and records written to Hadoop.">Output Size / Records</span>
+          </th>
+        <th class="">
+            <span data-toggle="tooltip" title="" data-original-title="Total shuffle bytes and records read (includes both data read locally and data read from
+       remote executors). ">
+            Shuffle Read Size / Records</span>
+          </th>
+        
+        
+      </tr></thead>
+      <tbody>
+        
+      <tr>
+            <td>4</td>
+            <td>CANNOT FIND ADDRESS</td>
+            <td sorttable_customkey="2460806">41 min</td>
+            <td>24</td>
+            <td>0</td>
+            <td>24</td>
+            
+            <td sorttable_customkey="496657204">
+                473.6 MB / 61
+              </td>
+            <td sorttable_customkey="130786">
+                127.7 KB / 61
+              </td>
+            
+            
+          </tr><tr>
+            <td>3</td>
+            <td>CANNOT FIND ADDRESS</td>
+            <td sorttable_customkey="2946233">49 min</td>
+            <td>117</td>
+            <td>0</td>
+            <td>117</td>
+            
+            <td sorttable_customkey="498552456">
+                475.5 MB / 70
+              </td>
+            <td sorttable_customkey="131378">
+                128.3 KB / 70
+              </td>
+            
+            
+          </tr><tr>
+            <td>2</td>
+            <td>ip-172-28-9-165.ap-southeast-2.compute.internal:36789</td>
+            <td sorttable_customkey="4100187">1.1 h</td>
+            <td>25</td>
+            <td>0</td>
+            <td>25</td>
+            
+            <td sorttable_customkey="758925522">
+                723.8 MB / 49
+              </td>
+            <td sorttable_customkey="176894">
+                172.7 KB / 49
+              </td>
+            
+            
+          </tr><tr>
+            <td>1</td>
+            <td>ip-172-28-125-157.ap-southeast-2.compute.internal:46660</td>
+            <td sorttable_customkey="4249241">1.2 h</td>
+            <td>62</td>
+            <td>0</td>
+            <td>62</td>
+            
+            <td sorttable_customkey="784763275">
+                748.4 MB / 48
+              </td>
+            <td sorttable_customkey="175683">
+                171.6 KB / 48
+              </td>
+            
+            
+          </tr></tbody>
+    <tfoot></tfoot></table><script>
+      
+      window.onload = function() {
+        sorttable.innerSortFunction.apply(document.getElementById('executorid'), [])
+      };
+        
+    </script><h4 id="tasks-section">Tasks</h4><div>
+        <div>
+        <div>
+          <form id="form-task-table-page" class="form-inline pull-right" style="margin-bottom: 0px;">
+            <label>3 Pages. Jump to</label>
+            <input type="text" id="form-task-table-page-no" value="3" class="span1">
+            <label>. Show </label>
+            <input type="text" id="form-task-table-page-size" value="100" class="span1">
+            <label>items in a page.</label>
+            <button type="submit" class="btn">Go</button>
+          </form>
+        </div>
+        <div class="pagination" style="margin-bottom: 0px;">
+          <span style="float: left; padding-top: 4px; padding-right: 4px;">Page: </span>
+          <ul>
+            
+            <li>
+            <a href="file:///home/jsofra/clojure-workspaces/bin-packing/doc/partitioning2.html" aria-label="Previous">
+              <span aria-hidden="true">
+                &lt;
+              </span>
+            </a>
+            </li>
+            <li><a href="file:///home/jsofra/clojure-workspaces/bin-packing/doc/partitioning1.html">1</a></li><li><a href="file:///home/jsofra/clojure-workspaces/bin-packing/doc/partitioning2.html">2</a></li><li class="disabled"><a href="http://ip-172-28-161-186.ap-southeast-2.compute.internal:18080/history/application_1466591592300_0002/1/stages/stage/?id=1&amp;attempt=0&amp;task.page=3&amp;task.sort=Index&amp;task.desc=false&amp;task.pageSize=100#">3</a></li>
+            
+            
+          </ul>
+        </div>
+        <script>
+          
+currentTaskPageSize = 100
+function goToTaskPage(page, pageSize) {
+  // Set page to 1 if the page size changes
+  page = pageSize == currentTaskPageSize ? page : 1;
+  var url = "/history/application_1466591592300_0002/1/stages/stage?id=1&attempt=0&task.sort=Index&task.desc=false" +
+    "&task.page=" + page + "&task.pageSize=" + pageSize;
+  window.location.href = url;
+}
+     
+
+          $(function(){
+  $( "#form-task-table-page" ).submit(function(event) {
+    var page = $("#form-task-table-page-no").val()
+    var pageSize = $("#form-task-table-page-size").val()
+    pageSize = pageSize ? pageSize: 100;
+    if (page != "") {
+      goToTaskPage(page, pageSize);
+    }
+    event.preventDefault();
+  });
+});
+        
+        </script>
+      </div>
+        <table class="table table-bordered table-condensed table-striped" id="task-table">
+          <thead><tr><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Index&amp;task.desc=true&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Index
+            <span>&nbsp;▴</span>
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=ID&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            ID
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Attempt&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Attempt
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Status&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Status
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Locality+Level&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Locality Level
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Executor+ID+%2F+Host&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Executor ID / Host
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Launch+Time&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Launch Time
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Duration&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Duration
+          </th><th class="scheduler_delay" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Scheduler+Delay&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Scheduler Delay
+          </th><th class="deserialization_time" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Task+Deserialization+Time&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Task Deserialization Time
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=GC+Time&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            GC Time
+          </th><th class="serialization_time" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Result+Serialization+Time&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Result Serialization Time
+          </th><th class="getting_result_time" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Getting+Result+Time&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Getting Result Time
+          </th><th class="peak_execution_memory" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Peak+Execution+Memory&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Peak Execution Memory
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Output+Size+%2F+Records&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Output Size / Records
+          </th><th class="fetch_wait_time" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Shuffle+Read+Blocked+Time&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Shuffle Read Blocked Time
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Shuffle+Read+Size+%2F+Records&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Shuffle Read Size / Records
+          </th><th class="shuffle_read_remote" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Shuffle+Remote+Reads&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Shuffle Remote Reads
+          </th><th class="" onclick="window.location.href=&#39;/history/application_1466591592300_0002/1/stages/stage?id=1&amp;attempt=0&amp;task.sort=Errors&amp;task.pageSize=100&#39;" style="cursor: pointer;">
+            Errors
+          </th></tr></thead>
+          <tbody>
+            <tr>
+      <td>200</td>
+      <td>262</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>NODE_LOCAL</td>
+      <td>2 / ip-172-28-9-165.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:11:41</td>
+      <td>9.6 min</td>
+      <td class="scheduler_delay">
+        20 ms
+      </td>
+      <td class="deserialization_time">
+        16 ms
+      </td>
+      <td>
+        33 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>98.5 MB / 2</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>27.6 KB / 2</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>201</td>
+      <td>263</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>RACK_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:11:45</td>
+      <td>11 min</td>
+      <td class="scheduler_delay">
+        13 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        40 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>123.6 MB / 2</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>17.9 KB / 2</td><td class="shuffle_read_remote">
+          17.9 KB
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>202</td>
+      <td>264</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>NODE_LOCAL</td>
+      <td>2 / ip-172-28-9-165.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:11:58</td>
+      <td>11 min</td>
+      <td class="scheduler_delay">
+        14 ms
+      </td>
+      <td class="deserialization_time">
+        16 ms
+      </td>
+      <td>
+        46 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>123.4 MB / 1</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>12.6 KB / 1</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>203</td>
+      <td>265</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>RACK_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:12:21</td>
+      <td>12 min</td>
+      <td class="scheduler_delay">
+        9 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        47 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>111.5 MB / 1</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>46.9 KB / 1</td><td class="shuffle_read_remote">
+          46.9 KB
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>204</td>
+      <td>230</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:56</td>
+      <td>1.0 s</td>
+      <td class="scheduler_delay">
+        17 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        24 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>205</td>
+      <td>231</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:56</td>
+      <td>1.0 s</td>
+      <td class="scheduler_delay">
+        27 ms
+      </td>
+      <td class="deserialization_time">
+        10 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>206</td>
+      <td>232</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:56</td>
+      <td>2 s</td>
+      <td class="scheduler_delay">
+        18 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        0.2 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>207</td>
+      <td>233</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:57</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        25 ms
+      </td>
+      <td class="deserialization_time">
+        9 ms
+      </td>
+      <td>
+        0.2 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>208</td>
+      <td>234</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:57</td>
+      <td>1 s</td>
+      <td class="scheduler_delay">
+        21 ms
+      </td>
+      <td class="deserialization_time">
+        13 ms
+      </td>
+      <td>
+        0.2 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>209</td>
+      <td>235</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:57</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        34 ms
+      </td>
+      <td class="deserialization_time">
+        12 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>210</td>
+      <td>236</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:57</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        26 ms
+      </td>
+      <td class="deserialization_time">
+        13 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>211</td>
+      <td>237</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:57</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        16 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>212</td>
+      <td>238</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:58</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        19 ms
+      </td>
+      <td class="deserialization_time">
+        13 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>213</td>
+      <td>239</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:58</td>
+      <td>1.0 s</td>
+      <td class="scheduler_delay">
+        21 ms
+      </td>
+      <td class="deserialization_time">
+        12 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>214</td>
+      <td>240</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:58</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        14 ms
+      </td>
+      <td class="deserialization_time">
+        10 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>215</td>
+      <td>241</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:58</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        21 ms
+      </td>
+      <td class="deserialization_time">
+        14 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>216</td>
+      <td>242</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:58</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        14 ms
+      </td>
+      <td class="deserialization_time">
+        12 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>217</td>
+      <td>243</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:58</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        17 ms
+      </td>
+      <td class="deserialization_time">
+        11 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>218</td>
+      <td>244</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:59</td>
+      <td>1 s</td>
+      <td class="scheduler_delay">
+        24 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        57 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>219</td>
+      <td>245</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:59</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        16 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        21 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>220</td>
+      <td>246</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:59</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        16 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        21 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>221</td>
+      <td>247</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:59</td>
+      <td>1.0 s</td>
+      <td class="scheduler_delay">
+        16 ms
+      </td>
+      <td class="deserialization_time">
+        13 ms
+      </td>
+      <td>
+        57 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>222</td>
+      <td>248</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:59</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        15 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        21 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>223</td>
+      <td>249</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:59</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        14 ms
+      </td>
+      <td class="deserialization_time">
+        8 ms
+      </td>
+      <td>
+        57 ms
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>224</td>
+      <td>250</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>PROCESS_LOCAL</td>
+      <td>3 / ip-172-28-14-194.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:11:00</td>
+      <td>0.9 s</td>
+      <td class="scheduler_delay">
+        17 ms
+      </td>
+      <td class="deserialization_time">
+        7 ms
+      </td>
+      <td>
+        
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>0.0 B / 0</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>0.0 B / 0</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>225</td>
+      <td>140</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>NODE_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:19</td>
+      <td>24 s</td>
+      <td class="scheduler_delay">
+        25 ms
+      </td>
+      <td class="deserialization_time">
+        16 ms
+      </td>
+      <td>
+        2 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>4.3 MB / 1</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>1011.0 B / 1</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>226</td>
+      <td>152</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>NODE_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:32</td>
+      <td>20 s</td>
+      <td class="scheduler_delay">
+        37 ms
+      </td>
+      <td class="deserialization_time">
+        20 ms
+      </td>
+      <td>
+        2 s
+      </td>
+      <td class="serialization_time">
+        0 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>4.5 MB / 1</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>1235.0 B / 1</td><td class="shuffle_read_remote">
+          0.0 B
+        </td>
+      
+      
+      <td> </td>
+    </tr><tr>
+      <td>227</td>
+      <td>174</td>
+      <td>0</td>
+      <td>SUCCESS</td>
+      <td>NODE_LOCAL</td>
+      <td>1 / ip-172-28-125-157.ap-southeast-2.compute.internal</td>
+      <td>2016/06/22 11:10:43</td>
+      <td>1.0 min</td>
+      <td class="scheduler_delay">
+        18 ms
+      </td>
+      <td class="deserialization_time">
+        23 ms
+      </td>
+      <td>
+        2 s
+      </td>
+      <td class="serialization_time">
+        1 ms
+      </td>
+      <td class="getting_result_time">
+        0 ms
+      </td>
+      <td class="peak_execution_memory">
+          0.0 B
+        </td>
+      
+      
+      <td>10.1 MB / 2</td>
+      <td class="fetch_wait_time">
+          0 ms
+        </td><td>3.1 KB / 2</td><td class="shuffle_read_remote">
+          2.0 KB
+        </td>
+      
+      
+      <td> </td>
+    </tr>
+          </tbody>
+        </table>
+      </div><script>
+          
+$(function() {
+  if (/.*&task.sort=.*$/.test(location.search)) {
+    var topOffset = $("#tasks-section").offset().top;
+    $("html,body").animate({scrollTop: topOffset}, 200);
+  }
+});
+            
+        </script>
+        </div>
+      
+    
+</body></html>

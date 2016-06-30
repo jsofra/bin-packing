@@ -18,10 +18,10 @@
       <div class="slides">
         <section data-background="img/birds_on_a_wire.jpg">
           <h1>Balancing Spark</h1>
+          <span style="font-size: 10px"><a href="https://pixabay.com/en/power-lines-birds-sky-cloudy-grey-690893/">Pixabay</a></span>
         </section>
         <section>
           <h1>Outline</h1>
-
           <ul>
             <li>Project Gutenberg</li>
             <li>Frequency Analysis</li>
@@ -59,6 +59,7 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
           </section>
           <section>
             <div class="subheading">Frequency Analysis</div>
+            <h3>Searching Gutenberg</h3>
             <p>Given some search terms:</p>
             <ol>
               <li>Find the text in each Gutenberg bookshelf that those terms are most important to.</li>
@@ -79,10 +80,11 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
         <section>
           <section data-background="img/skewed_fence.jpeg">
             <h1>Data Skew</h1>
+            <span style="font-size: 10px"><a href="https://pixabay.com/en/fence-wood-fence-wood-limit-470221/">Pixabay</a></span>
           </section>
           <section>
             <div class="subheading">Data Skew</div>
-            <h3>What's the problem?</h3>
+            <h3>What's the data skew problem?</h3>
             <div style="text-align: right; float: left; width:60%">
             <br><br><br><br><br>
             <ul>
@@ -123,9 +125,7 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
               <li>Could exist in persisted data, i.e. on s3 or hdfs</li>
               <li>May come about from grouping of data</li>
             </ul>
-
             <br><br>
-
             <div>
               <img src="img/s3skew2.png" style="margin: 10px">
               <span style="font-size: 10px">
@@ -133,7 +133,6 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
                 <br>
                 <a title="from backtobazics.com" href="http://backtobazics.com/big-data/spark/apache-spark-groupby-example/">from backtobazics.com</a></span>
             </div>
-
           </section>
           <section>
             <div class="subheading">Data Skew</div>
@@ -141,7 +140,7 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
             <p>Inherently skewed data set; 228 bookshelves, 1 book minimum, 1341 book maximum, standard deviation ~ 121</P>
             <a href="https://www.gutenberg.org/w/index.php?title=Category:Bookshelf">https://www.gutenberg.org/w/index.php?title=Category:Bookshelf</a>
             <iframe src="Category_Bookshelf%20-%20Gutenberg.html"
-                    height="80%" width="100%"></iframe>
+                    height="80%" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
           </section>
         </section>
         <section>
@@ -153,9 +152,6 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
           <section>
             <div class="subheading">Diagnosis</div>
             <h3>How do you know if you have skewed data?</h3>
-          </section>
-          <section>
-            <div class="subheading">Diagnosis</div>
             <ul>
               <li>Hierarchical data</li>
               <li>Measuring size of data in partitions</li>
@@ -163,12 +159,28 @@ https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="h
               <li>Using metrics tools e.g. Spark UI and Ganglia</li>
             </ul>
           </section>
+          <section>
+            <div class="subheading">Diagnosis</div>
+            <h3>Diagnosis via Ganglia</h3>
+            <iframe src="Ganglia_skew.html"
+                    height="90%" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+          </section>
+          <section>
+            <div class="subheading">Diagnosis</div>
+            <h3>Diagnosis via Spark UI</h3>
+            <iframe src="sparkui_skew.html"
+                    height="90%" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+          </section>
         </section>
         <section>
           <section data-background="img/partition.jpg">
             <h1>Partitioning</h1>
             <span style="font-size: 10px">© 2012 <a title="'partitioned' published on Flickr by timlewisnm" href="https://www.flickr.com/people/gozalewis/">timlewisnm</a>, <a title="from Flickr" href="https://www.flickr.com/photos/gozalewis/6776479350/">Flickr</a> | <a title="Creative Commons Attribution-ShareAlike License
 https://creativecommons.org/licenses/by-sa/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>  | <a title="Easily credit free 'partitioning' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Diagnosis</div>
+            <h3>Can we partition our way out of this?</h3>
           </section>
           <section>
             <div class="subheading">Partitioning</div>
@@ -186,21 +198,36 @@ https://creativecommons.org/licenses/by-sa/2.0/" style="font-size: .8em" href="h
           <section>
             <div class="subheading">Partitioning</div>
             <div style="width:80%; margin:auto">
+              <img src="img/workers_and_partitions.png" style="background:white !important">
+              <br><br>
               <ul>
                 <li>More partitions = greater potential parallelism</li>
                 <li>Ideally we would have as many workers as partitions</li>
+                <li>In this case the size of the largest partition would be the limiting factor</li>
               </ul>
-              <br><br>
-              <img src="img/workers_and_partitions.png" style="background:white !important">
             </div>
           </section>
           <section>
             <div class="subheading">Partitioning</div>
             <div style="width:80%; margin:auto">
+              <h3>Can we simply partition to the number of items we have?</h3>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Partitioning</div>
+            <h3>Partitioning the Gutenberg data into the exact number of bookshelves</h3>
+            <iframe src="partitioning1.html"
+                    height="90%" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+          </section>
+          <section>
+            <div class="subheading">Partitioning</div>
+            <div style="width:80%; margin:auto">
+              <h3>Problems with simple partitioning?</h3>
               <ul>
-                <li>One worker per partition</li>
-                <li>Combined with data skew this can lead to poor throughput</li>
-                <li>More partitions = greater potential parallelism</li>
+                <li>Too many tiny tasks could lead to a lot of overhead</li>
+                <li>Large partitions may still be scheduled on the same node or toward the end of the run</li>
+                <li>May need more hardware to achieve the optimal parallelism</li>
+                <li>Still some unused capacity</li>
               </ul>
             </div>
           </section>
@@ -375,10 +402,10 @@ https://creativecommons.org/licenses/by-sa/2.0/" style="font-size: .8em" href="h
           </section>
         </section>
         <section>
-          <section data-background="img/bins.jpg">
+          <section data-background="img/blue_bins.jpg">
             <h1>Bin Packing</h1>
-            <span style="font-size: 10px">© 2015 <a title="'Bin End' published on Flickr by Andrew Gustar" href="https://www.flickr.com/people/andrewgustar/">Andrew Gustar</a>, <a title="from Flickr" href="https://www.flickr.com/photos/andrewgustar/16215526035/">Flickr</a> | <a title="Creative Commons Attribution-NoDerivs License
-https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-nd/2.0/">CC-BY-ND</a>  | <a title="Easily credit free 'bins' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+            <span style="font-size: 10px">© 2014 <a title="'Bins' published on Flickr by Ozzy Delaney" href="https://www.flickr.com/people/24931020@N02/">Ozzy Delaney</a>, <a title="from Flickr" href="https://www.flickr.com/photos/24931020@N02/15665751965/">Flickr</a> | <a title="Creative Commons Attribution License
+https://creativecommons.org/licenses/by/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by/2.0/">CC-BY</a>  | <a title="Easily credit free 'bins' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
           </section>
           <section>
             <div class="subheading">Bin Packing</div>
@@ -511,6 +538,19 @@ if not horizon:
           </section>
           <section>
             <div class="subheading">Bin Packing</div>
+            <h3>Bin Packing the Gutenberg data</h3>
+            <iframe src="bin_packed.html"
+                    height="90%" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/spark_plugs.jpg">
+            <h1>Spark Implementation</h1>
+            <span style="font-size: 10px">© 2012 <a title="'Retired sparking plug' published on Flickr by Yu-Chan Chen" href="https://www.flickr.com/people/spongebabyalwaysfull/">Yu-Chan Chen</a>, <a title="from Flickr" href="https://www.flickr.com/photos/spongebabyalwaysfull/8140352476/">Flickr</a> | <a title="Public Domain Mark
+https://creativecommons.org/publicdomain/mark/1.0/" style="font-size: .8em" href="https://creativecommons.org/publicdomain/mark/1.0/">PD-MK</a>  | <a title="Easily credit free 'spark plugs' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Spark Implementation</div>
             <div>
               <h3>Bin Partitioning in Spark</h3>
               <div style="text-align: left; float: left; width:50%">
@@ -557,8 +597,103 @@ if not horizon:
             </div>
           </section>
           <section>
-            <iframe src="bin%20packing%20example%20-%20Details%20for%20Stage%201%20(Attempt%200)p.html"
-                    height="90%" width="100%"></iframe>
+            <div class="subheading">Spark Implementation</div>
+            <div>
+              <h3>Spark in Clojure</h3>
+              <div style="text-align: left; float: left; width:50%">
+                <pre><code style="max-height: none !important">
+(ns bin-packing.spark-utils
+  (:require [sparkling.core :as spark]
+            [sparkling.destructuring :as de])
+  (:import org.apache.spark.api.java.JavaRDD
+           org.apache.spark.api.java.JavaPairRDD)
+  (:refer-clojure :exclude [map count group-by mapcat reduce filter]))
+
+(defprotocol Transformers
+  (-map      [coll f])
+  (-map-vals [coll f])
+  (-group-by [coll f])
+  (-mapcat   [coll f])
+  (-reduce   [coll f])
+  (-filter   [coll f])
+  (-to-map   [coll])
+  (-cache    [coll]))
+
+(extend-protocol Transformers
+  org.apache.spark.api.java.JavaRDD
+  (-map [coll f] (spark/map f coll))
+  ...
+  org.apache.spark.api.java.JavaPairRDD
+  (-map [coll f] (spark/map (de/key-value-fn (fn [k v] (f [k v]))) coll))
+  ...
+  clojure.lang.IPersistentMap
+  (-map [coll f] (clojure.core/map f coll))
+  ...
+  clojure.lang.IPersistentCollection
+  (-map [coll f] (clojure.core/map f coll))
+  ...
+  )
+
+(defn map [f coll] (-map coll f))
+         </code></pre>
+              </div>
+              <div style="text-align: left; float: right; width:50%">
+                <br><br><br>
+                <ul>
+                  <li>Uses the Clojure <a href="https://gorillalabs.github.io/sparkling/">Sparkling</a> library (a wrapper over the Java API).</li>
+                  <li>Defined a protocol to unify Spark and Clojure API's.</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Spark Implementation</div>
+            <div>
+              <h3>tf-idf in Spark</h3>
+              <div style="text-align: left; float: left; width:50%">
+                <pre><code style="max-height: none !important">
+(ns bin-packing.tf-idf
+  (:require [bin-packing.spark-utils :as su]))
+
+(defn tf [terms]
+  (let [n-terms (count terms)]
+    (su/map-vals (partial calc-tf n-terms) (frequencies terms))))
+
+(defn term-doc-counts [id-and-terms]
+  (->> (su/mapcat (fn [[k v]] v) id-and-terms)
+       (su/group-by identity)
+       (su/map-vals count)))
+
+(defn idf [n-docs term-doc-counts]
+  (su/map-vals (partial calc-idf n-docs) term-doc-counts))
+
+(defn calc-tf-and-idf [id-doc-pairs]
+  (let [id-and-terms (su/cache (su/map-vals get-terms id-doc-pairs))]
+    {:tfs (su/map-vals tf id-and-terms)
+     :idf (su/to-map (idf (su/count id-doc-pairs)
+                          (term-doc-counts id-and-terms)))}))
+
+(defn calc-tf-idf [{:keys [tfs idf]} & {:keys [sc]}]
+  (let [idf-b (su/broadcast idf :sc sc)]
+    (su/map-vals #(merge-with * % (select-keys @idf-b (keys %)))
+                 tfs)))
+
+(defn tf-idf [id-doc-pairs]
+  (-> id-doc-pairs
+      calc-tf-and-idf
+      calc-tf-idf))
+         </code></pre>
+              </div>
+              <div style="text-align: left; float: right; width:50%">
+                <br><br><br>
+                <p>Uses the Spark Utils so the same tf-idf algorithm can be run on Clojure data structures (books in a bookshelf) or an RDD (whole bookshelves).</p>
+              </div>
+            </div>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/race.jpg">
+            <h1>Results</h1>
           </section>
         </section>
       </div>
