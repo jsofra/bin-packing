@@ -17,30 +17,36 @@
                 (map-indexed vector bins))))
 
 (defn pack
-  ([items] (pack items (second (first items))))
-  ([items max-size]
-   (let [empty-bin {:size 0 :items []}
-         init-bins [empty-bin]]
+  "Simple first fit packing algorithm."
+  ([items no-fit-fn] (pack items no-fit-fn (second (first items))))
+  ([items no-fit-fn max-size]
+   (let [init-bins [{:size 0 :items []}]]
      (reduce (fn [bins item]
                (if-let [fit (select-bin bins item max-size)]
                  (update-in bins [fit] #(add-to-bin % item))
-                 (conj bins (add-to-bin empty-bin item))))
+                 (no-fit-fn bins item)))
              init-bins items))))
+
+(defn grow-bins [bins item]
+  (conj bins (add-to-bin {:size 0 :items []} item)))
+
+(defn first-fit
+  "Simple first fit algorithm that grows bins once reaching max-size.
+   Should give min required bins."
+  ([items] (pack items grow-bins))
+  ([items max-size] (pack items grow-bins max-size)))
+
+(defn add-to-smallest-bin [n bins item]
+  (if (< (count bins) n)
+    (grow-bins bins item)
+    (update-in bins [(select-smallest-bin bins)]
+              #(add-to-bin % item))))
 
 (defn pack-n-bins
-  ([items n] (pack-n-bins items n (second (first items))))
-  ([items n max-size]
-   (let [empty-bin {:size 0 :items []}
-         init-bins [empty-bin]]
-     (reduce (fn [bins item]
-               (if-let [fit (select-bin bins item max-size)]
-                 (update-in bins [fit] #(add-to-bin % item))
-                 (if (< (count bins) n)
-                   (conj bins (add-to-bin empty-bin item))
-                   (update-in bins [(select-smallest-bin bins)]
-                              #(add-to-bin % item)))))
-             init-bins items))))
-
+  "Simple first fit algorithm that continues to add to the smallest bin
+   once n bins have been filled to max-size."
+  ([items n] (pack items (partial add-to-smallest-bin n)))
+  ([items n max-size] (pack items (partial add-to-smallest-bin n) max-size)))
 
 (defn pack-n-bins-ish [items n]
   (let [max-size (/ (reduce + (map second items)) (dec n))]
@@ -85,14 +91,14 @@
       keys  [:a :b :c :d :e :f :g :h :i :j]
       items (map vector keys sizes)]
   (assert
-   (= (pack items)
+   (= (first-fit items)
       [{:size 9 :items [[:a 9] [:j 0]]}
        {:size 9 :items [[:b 8] [:i 1]]}
        {:size 9 :items [[:c 7] [:h 2]]}
        {:size 9 :items [[:d 6] [:g 3]]}
        {:size 9 :items [[:e 5] [:f 4]]}]))
   (assert
-   (= (item-indices (pack items))
+   (= (item-indices (first-fit items))
       {:bin-count 5
        :item-indices {:a 0 :b 1 :c 2 :d 3 :e 4
                       :f 4 :g 3 :h 2 :i 1 :j 0}})))
