@@ -1,0 +1,576 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/theme/night.css">
+    <link rel="stylesheet" href="lib/css/zenburn.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/headjs/0.96/head.min.js"></script>
+  </head>
+  <body>
+    <style>
+      .subheading {
+      position: fixed;
+      top: 0px !important;
+      left: 0px !important;
+      color: #383838;
+      }
+    </style>
+    <div class="reveal">
+      <div class="slides">
+        <section data-background="img/birds_on_a_wire.jpg">
+          <h1>Balancing Spark</h1>
+        </section>
+        <section>
+          <h1>Outline</h1>
+
+          <ul>
+            <li>Project Gutenberg</li>
+            <li>Frequency Analysis</li>
+            <li>Data Skew</li>
+            <li>Diagnosis</li>
+            <li>Partitioning</li>
+            <li>Packing Problems</li>
+            <li>Bin Packing</li>
+            <li>Spark Implementation</li>
+            <li>Results</li>
+            <li>Conclusion</li>
+          </ul>
+        </section>
+        <section>
+          <section data-background="img/gutenberg.jpg">
+            <h1>Project Gutenberg</h1>
+            <span style="font-size: 10px">© 2012 <a title="'Gutenburg Bible in J P Morgan Library New York.' published on Flickr by denisbin" href="https://www.flickr.com/people/82134796@N03/">denisbin</a>, <a title="from Flickr" href="https://www.flickr.com/photos/82134796@N03/9868919325/">Flickr</a> | <a title="Creative Commons Attribution-NoDerivs License
+https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-nd/2.0/">CC-BY-ND</a>  | <a title="Easily credit free 'gutenburg' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Project Gutenberg</div>
+            <h3>Project Gutenberg</h3>
+            <a href="https://www.gutenberg.org/">https://www.gutenberg.org/</a>
+            <p>The data for the examples presented in this talk will come from Project Gutenberg.</p>
+            <p>Gutenberg hosts over 50,000 free ebooks in which their copyright has run out or are otherwise in the public domain.</p>
+            <p>We will be using the texts in the <a href="https://www.gutenberg.org/w/index.php?title=Category:Bookshelf">Gutenberg Bookshelf</a>, it categorises a large number of texts into 'bookshelves' of related texts. e.g. Adventure, Sci-Fi etc.</p>
+            <p>The plain text files in the bookshelves total around 30GB of data.</p>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/freq.jpg">
+            <h1>Frequency Analysis</h1>
+            <span style="font-size: 10px">© 2007 <a title="'Frequencies' published on Flickr by Francesco Paroni Sterbini" href="https://www.flickr.com/people/chiccops/">Francesco Paroni Sterbini</a>, <a title="from Flickr" href="https://www.flickr.com/photos/chiccops/400544065/">Flickr</a> | <a title="Creative Commons Attribution-NoDerivs License
+https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-nd/2.0/">CC-BY-ND</a>  | <a title="Easily credit free 'frequency' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Frequency Analysis</div>
+            <p>Given some search terms:</p>
+            <ol>
+              <li>Find the text in each Gutenberg bookshelf that those terms are most important to.</li>
+              <li>Find the Gutenberg bookshelf that those terms are most important to.</li>
+            </ol>
+          </section>
+          <section>
+            <div class="subheading">Frequency Analysis</div>
+            <h3>tf-idf</h3>
+            <p>To solve this we will use the well known <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">Term Frequency-Inverse Document Frequency</a> (tf-idf) method.</p>
+            <ul>
+              <li>proportional to number of times a word appear in a document</li>
+              <li>offset by the frequency of the word in the whole corpus</li>
+              <li>adjusts for the fact that some words appear more frequently in general</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/skewed_fence.jpeg">
+            <h1>Data Skew</h1>
+          </section>
+          <section>
+            <div class="subheading">Data Skew</div>
+            <h3>What's the problem?</h3>
+            <div style="text-align: right; float: left; width:60%">
+            <br><br><br><br><br>
+            <ul>
+              <li>Uneven distribution of data/work across the cluster</li>
+              <li>Some nodes do an unfair share of the work</li>
+              <li>Others nodes may sit around doing very little</li>
+              <li>Inefficient, unused capacity</li>
+            </ul>
+            </div>
+            <div style="text-align: left; float: right; width:40%">
+            <svg width="600" height="600">
+              <g transform="rotate(180)  translate(-550 -400) scale(1.5 1.5)">
+                <rect width="10" height="10" x="0" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="10" x="20" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="15" x="40" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="20" x="60" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="25" x="80" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="35" x="100" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="50" x="120" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="55" x="140" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="30" x="160" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="80" x="180" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="100" x="200" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="65" x="220" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="110" x="240" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="140" x="260" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="200" x="280" y="0" fill="#0099cc"></rect>
+                <rect width="10" height="100" x="300" y="0" fill="#0099cc"></rect>
+              </g>
+            </svg>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Data Skew</div>
+            <h3>Causes of skew</h3>
+            <ul>
+              <li>Could be inherent in the data</li>
+              <li>Could exist in persisted data, i.e. on s3 or hdfs</li>
+              <li>May come about from grouping of data</li>
+            </ul>
+
+            <br><br>
+
+            <div>
+              <img src="img/s3skew2.png" style="margin: 10px">
+              <span style="font-size: 10px">
+                <img src="img/apache-spark-groupby-example.gif" style="margin: 10px">
+                <br>
+                <a title="from backtobazics.com" href="http://backtobazics.com/big-data/spark/apache-spark-groupby-example/">from backtobazics.com</a></span>
+            </div>
+
+          </section>
+          <section>
+            <div class="subheading">Data Skew</div>
+            <h3>Project Gutenberg Bookshelves</h3>
+            <p>Inherently skewed data set; 228 bookshelves, 1 book minimum, 1341 book maximum, standard deviation ~ 121</P>
+            <a href="https://www.gutenberg.org/w/index.php?title=Category:Bookshelf">https://www.gutenberg.org/w/index.php?title=Category:Bookshelf</a>
+            <iframe src="Category_Bookshelf%20-%20Gutenberg.html"
+                    height="80%" width="100%"></iframe>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/diagnosis.jpg">
+            <h1>Diagnosis</h1>
+            <span style="font-size: 10px">© 2008 <a title="'2008.11.25 - The physician' published on Flickr by Adrian Clark" href="https://www.flickr.com/people/adrianclarkmbbs/">Adrian Clark</a>, <a title="from Flickr" href="https://www.flickr.com/photos/adrianclarkmbbs/3063516728/">Flickr</a> | <a title="Creative Commons Attribution-NoDerivs License
+https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-nd/2.0/">CC-BY-ND</a>  | <a title="Easily credit free 'diagnosis' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Diagnosis</div>
+            <h3>How do you know if you have skewed data?</h3>
+          </section>
+          <section>
+            <div class="subheading">Diagnosis</div>
+            <ul>
+              <li>Hierarchical data</li>
+              <li>Measuring size of data in partitions</li>
+              <li>Estimating/measuring size of data in groups after grouping</li>
+              <li>Using metrics tools e.g. Spark UI and Ganglia</li>
+            </ul>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/partition.jpg">
+            <h1>Partitioning</h1>
+            <span style="font-size: 10px">© 2012 <a title="'partitioned' published on Flickr by timlewisnm" href="https://www.flickr.com/people/gozalewis/">timlewisnm</a>, <a title="from Flickr" href="https://www.flickr.com/photos/gozalewis/6776479350/">Flickr</a> | <a title="Creative Commons Attribution-ShareAlike License
+https://creativecommons.org/licenses/by-sa/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>  | <a title="Easily credit free 'partitioning' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Partitioning</div>
+            <div style="width:80%; margin:auto">
+              <img src="img/rdd.png" style="background:white !important">
+              <br><br>
+              <ul>
+                <li>An RDD has a fixed number of partitions</li>
+                <li>One task per partition (on a map operation)</li>
+                <li>Each task assigned to one worker at a time</li>
+                <li>Combined with data skew this can lead to poor throughput</li>
+              </ul>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Partitioning</div>
+            <div style="width:80%; margin:auto">
+              <ul>
+                <li>More partitions = greater potential parallelism</li>
+                <li>Ideally we would have as many workers as partitions</li>
+              </ul>
+              <br><br>
+              <img src="img/workers_and_partitions.png" style="background:white !important">
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Partitioning</div>
+            <div style="width:80%; margin:auto">
+              <ul>
+                <li>One worker per partition</li>
+                <li>Combined with data skew this can lead to poor throughput</li>
+                <li>More partitions = greater potential parallelism</li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/pack.jpg">
+            <h1>Packing Problems</h1>
+          </section>
+
+          <section>
+            <div class="subheading">Packing Problems</div>
+            <div style="width:80%; margin:auto">
+              <p>To create more balanced computation across the workers maybe we can partition the data into more evenly weighted partitions?</p>
+            </div>
+
+            <br>
+
+            <svg id="bars" width="600" height="400">
+            <g id="bars_rotate" transform="rotate(180)  translate(-580 -400) scale(1.8 1.8)">
+              <rect id="bar1" width="10" height="10" x="0" y="0" fill="#0099cc"></rect>
+              <rect id="bar2" width="10" height="10" x="20" y="0" fill="#0099cc"></rect>
+              <rect id="bar3" width="10" height="15" x="40" y="0" fill="#0099cc"></rect>
+              <rect id="bar4" width="10" height="20" x="60" y="0" fill="#0099cc"></rect>
+              <rect id="bar5" width="10" height="25" x="80" y="0" fill="#0099cc"></rect>
+              <rect id="bar6" width="10" height="35" x="100" y="0" fill="#0099cc"></rect>
+              <rect id="bar7" width="10" height="50" x="120" y="0" fill="#0099cc"></rect>
+              <rect id="bar8" width="10" height="55" x="140" y="0" fill="#0099cc"></rect>
+              <rect id="bar9" width="10" height="30" x="160" y="0" fill="#0099cc"></rect>
+              <rect id="bar10" width="10" height="80" x="180" y="0" fill="#0099cc"></rect>
+              <rect id="bar11" width="10" height="100" x="200" y="0" fill="#0099cc"></rect>
+              <rect id="bar12" width="10" height="65" x="220" y="0" fill="#0099cc"></rect>
+              <rect id="bar13" width="10" height="110" x="240" y="0" fill="#0099cc"></rect>
+              <rect id="bar14" width="10" height="140" x="260" y="0" fill="#0099cc"></rect>
+              <rect id="bar15" width="10" height="200" x="280" y="0" fill="#0099cc"></rect>
+              <rect id="bar16" width="10" height="100" x="300" y="0" fill="#0099cc"></rect>
+            </g>
+
+            <style>
+              #bars:hover #bar1 { animation: ani_bar1 4s linear infinite; }
+              @keyframes ani_bar1 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 6.5); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar2 { animation: ani_bar2 4s linear infinite; }
+              @keyframes ani_bar2 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 6.5); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar3 { animation: ani_bar3 4s linear infinite; }
+              @keyframes ani_bar3 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 4.33); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar4 { animation: ani_bar4 4s linear infinite; }
+              @keyframes ani_bar4 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 3.25); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar5 { animation: ani_bar5 4s linear infinite; }
+              @keyframes ani_bar5 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 2.6); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar6 { animation: ani_bar6 4s linear infinite; }
+              @keyframes ani_bar6 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 1.857); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+
+              #bars:hover #bar7 { animation: ani_bar7 4s linear infinite; }
+              @keyframes ani_bar7 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 1.3); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar8 { animation: ani_bar8 4s linear infinite; }
+              @keyframes ani_bar8 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 1.18); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar9 { animation: ani_bar9 4s linear infinite; }
+              @keyframes ani_bar9 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 2.166); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar10 { animation: ani_bar10 4s linear infinite; }
+              @keyframes ani_bar10 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 0.8125); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar11 { animation: ani_bar11 4s linear infinite; }
+              @keyframes ani_bar11 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 0.65); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar12 { animation: ani_bar12 4s linear infinite; }
+              @keyframes ani_bar12 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 1); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar13 { animation: ani_bar13 4s linear infinite; }
+              @keyframes ani_bar13 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 0.59); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar14 { animation: ani_bar14 4s linear infinite; }
+              @keyframes ani_bar14 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 0.464); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar15 { animation: ani_bar15 4s linear infinite; }
+              @keyframes ani_bar15 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 0.325); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+              #bars:hover #bar16 { animation: ani_bar16 4s linear infinite; }
+              @keyframes ani_bar16 {
+              0% { transform: scale(1, 1); }
+              30%, 50% { transform: scale(1, 0.65); }
+              80%, 100% { transform: scale(1, 1); }
+              }
+            </style>
+          </svg>
+
+          </section>
+          <section>
+            <div class="subheading">Packing Problems</div>
+            <div style="width:80%; margin:auto">
+              <p>The problem roughly falls into a class of optimization problems known as packing problems.</p>
+              <a href="https://en.wikipedia.org/wiki/Packing_problems">https://en.wikipedia.org/wiki/Packing_problems</a>
+              <br>
+              <div style="text-align: right; float: left; width:45%">
+                <ul>
+                  <li>Set packing</li>
+                  <li>Bin packing problem</li>
+                  <li>Slothouber-Graatsma puzzle</li>
+                  <li>Conway puzzle</li>
+                  <li>Tetris</li>
+                  <li>Covering problem</li>
+                </ul>
+              </div>
+              <div style="text-align: left; float: right; width:45%">
+                <ul>
+                  <li>Knapsack problem</li>
+                  <li>Tetrahedron packing</li>
+                  <li>Cutting stock problem</li>
+                  <li>Kissing number problem</li>
+                  <li>Close-packing of equal spheres</li>
+                  <li>Random close pack</li>
+                </ul>
+              </div>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Packing Problems</div>
+            <div style="width:80%; margin:auto">
+              <p>These are <a href="https://en.wikipedia.org/wiki/NP-hardness">NP-hard</a> problems so we will need to make use of heuristical methods or possibly a constraint solver.</p>
+          </section>
+        </section>
+        <section>
+          <section data-background="img/bins.jpg">
+            <h1>Bin Packing</h1>
+            <span style="font-size: 10px">© 2015 <a title="'Bin End' published on Flickr by Andrew Gustar" href="https://www.flickr.com/people/andrewgustar/">Andrew Gustar</a>, <a title="from Flickr" href="https://www.flickr.com/photos/andrewgustar/16215526035/">Flickr</a> | <a title="Creative Commons Attribution-NoDerivs License
+https://creativecommons.org/licenses/by-nd/2.0/" style="font-size: .8em" href="https://creativecommons.org/licenses/by-nd/2.0/">CC-BY-ND</a>  | <a title="Easily credit free 'bins' pictures with Wylio." href="https://www.wylio.com">via Wylio</a></span>
+          </section>
+          <section>
+            <div class="subheading">Bin Packing</div>
+            <div style="width:80%; margin:auto">
+              <p>Our problem seems most closely related to the <a href="https://en.wikipedia.org/wiki/Bin_packing_problem">Bin packing</a> problem (minimum number of bins of a certain volume) or maybe the <a href="https://en.wikipedia.org/wiki/Multiprocessor_scheduling">Multiprocessor scheduling problem</a> (pack into a specific number of bins)</p>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Bin Packing</div>
+            <div style="width:80%; margin:auto">
+              <h3>Contraint Solver Solution</h3>
+              <p>Attempted using a constraint solver (in Python), it was FAR too slow!</p>
+              <pre><code class="python">
+from pyschedule import Scenario, solvers
+import base64
+
+def bin_packing_solver(items, get_size=lambda x: x[1], get_label=lambda x: x[0], partitions=10, horizon=None):
+
+if not horizon:
+  horizon = get_size(items[0]) + 1
+
+  S = Scenario('binpacking', horizon=horizon)
+  resources = map(lambda x: S.Resource(str(x)), range(partitions))
+  tasks = map(lambda x: S.Task(base64.b64encode(get_label(x)), get_size(x)), items)
+
+  for t in tasks:
+    t += reduce(lambda x,y: x|y, resources)
+
+  S.use_makespan_objective()
+  solvers.mip.solve(S,msg=1)
+  return {base64.b64decode(str(s[0])): s[1] for s in S.solution()[:-1]}
+                </code></pre>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Bin Packing</div>
+            <div style="width:80%; margin:auto">
+              <h3>Bin Packing Methods</h3>
+              <ol>
+                <li>First Fit (smallest number of fixed sized bins)</li>
+                <li>First Fit + Smallest Bin (fixed number of bins)</li>
+              </ol>
+              <p><b><u>Note:</u></b> that these methods were chosen for their ease of implementation, the actual methods are however somewhat orthogonal to solving this partitioning problem in Spark.</p>
+              <br>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Bin Packing</div>
+            <div>
+              <h3>First Fit packing of a sorted list of items</h3>
+              <div style="text-align: left; float: left; width:50%;">
+                <pre><code style="max-height: none !important">
+(defn grow-bins [bins item]
+  (conj bins (add-to-bin {:size 0 :items []} item)))
+
+(defn first-fit-pack
+  "Simple first fit algorithm that grows bins once reaching max-size.
+   Should give min required bins."
+  [items max-size]
+  (let [init-bins [{:size 0 :items []}]]
+    (reduce (fn [bins item]
+              (if-let [fit (select-bin bins item max-size)]
+                (update-in bins [fit] #(add-to-bin % item))
+                (grow-bins bins item)))
+            init-bins items)))
+
+(let [items [[:a 9] [:b 7] [:c 6] [:d 5] [:e 5] [:f 4] [:g 3] [:h 2] [:i 1]]]
+  (assert
+   (= (first-fit-pack items 9)
+      [{:size 9 :items [[:a 9]]}
+       {:size 9 :items [[:b 7] [:h 2]]}
+       {:size 9 :items [[:c 6] [:g 3]]}
+       {:size 9 :items [[:d 5] [:f 4]]}
+       {:size 6 :items [[:e 5] [:i 1]]}])))
+                </code></pre>
+              </div>
+              <div style="text-align: left; float: right; width:50%">
+                <br>
+                <ol style="font-size:24">
+                  <li>start with a single empty bin (maybe the size of the largest item)</li>
+                  <li>for each item find the first bin that it will fit into and place it into the bin</li>
+                  <li>if no bins will fit the item create a new bin to put it into to</li>
+                  <li>continue until all items are exhausted</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Bin Packing</div>
+            <div>
+              <h3>First Fit + Smallest Bin packing of a sorted list of items</h3>
+              <div style="text-align: left; float: left; width:50%">
+                <pre><code style="max-height: none !important">
+(defn add-to-smallest-bin [n bins item]
+  (if (< (count bins) n)
+    (grow-bins bins item)
+    (update-in bins [(select-smallest-bin bins)]
+               #(add-to-bin % item))))
+
+(defn first-fit-smallest-bin-pack
+  "Simple first fit algorithm that continues to add to the smallest bin
+   once n bins have been filled to max-size."
+  [items n max-size]
+  (let [init-bins [{:size 0 :items []}]]
+    (reduce (fn [bins item]
+              (if-let [fit (select-bin bins item max-size)]
+                (update-in bins [fit] #(add-to-bin % item))
+                (add-to-smallest-bin n bins item)))
+            init-bins items)))
+
+
+(let [items [[:a 9] [:b 7] [:c 6] [:d 5] [:e 5] [:f 4] [:g 3] [:h 2] [:i 1]]]
+  (assert
+   (= (first-fit-smallest-bin-pack items 9 3)
+      [{:size 14 :items [[:a 9] [:f 4] [:i 1]]}
+       {:size 14 :items [[:b 7] [:e 5] [:h 2]]}
+       {:size 14 :items [[:c 6] [:d 5] [:g 3]]}])))
+         </code></pre>
+              </div>
+              <div style="text-align: left; float: right; width:50%">
+                <br>
+                <ol style="font-size:24">
+                  <li>start with a single empty bin (maybe the size of the largest item)</li>
+                  <li>for each item find the first bin that it will fit into and place it into the bin</li>
+                  <li>if no bins will fit the item add it too the bin that has the least in it</li>
+                  <li>continue until all items are exhausted</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Bin Packing</div>
+            <div>
+              <h3>Bin Partitioning in Spark</h3>
+              <div style="text-align: left; float: left; width:50%">
+                <pre><code style="max-height: none !important">
+(let [items [[:a 9] [:b 7] [:c 6] [:d 5] [:e 5] [:f 4] [:g 3] [:h 2] [:i 1]]]
+  (assert
+   (= (-> items
+          (bin-packing/first-fit-smallest-bin-pack items 9 3)
+          bin-packing/item-indices)
+          {:bin-count 3
+           :item-indices {:e 1 :g 2 :c 2 :h 1 :b 1 :d 2 :f 0 :i 0 :a 0}})))
+
+
+(defn partitioner-fn [n-partitions partition-fn]
+  (su/log "Partitioning into" n-partitions "partitions.")
+  (proxy [Partitioner] []
+    ;; get partition index
+    (getPartition [key] (partition-fn key))
+    (numPartitions [] n-partitions)))
+
+(defn partition-into-bins [ebook-urls weight-fn]
+  (let [ebook-urls    (spark/cache ebook-urls)
+        packing-items (spark/collect
+                       (su/map (fn [[k v]] [k (weight-fn v)])
+                               ebook-urls))
+        indices       (-> (sort-by second > packing-items)
+                          (bin-packing/first-fit-smallest-bin-pack 16)
+                          bin-packing/item-indices)]
+    (spark/partition-by
+     (partitioner-fn (:bin-count indices) (:item-indices indices))
+     ebook-urls)))
+         </code></pre>
+              </div>
+              <div style="text-align: left; float: right; width:50%">
+                <br>
+                <ol style="font-size:24">
+                  <li>Using a weighting function generate a size for each key in the target RDD</li>
+                  <li>Apply bin packing using the key size pairs</li>
+                  <li>Generate function that given a key returns the bin (partition) index</li>
+                  <li>Create a Partitioner instance using the generated partitioning function</li>
+                  <li>Use the Partitioner instance to run partition-by on the RDD</li>
+                </ol>
+              </div>
+            </div>
+          </section>
+          <section>
+            <iframe src="bin%20packing%20example%20-%20Details%20for%20Stage%201%20(Attempt%200)p.html"
+                    height="90%" width="100%"></iframe>
+          </section>
+        </section>
+      </div>
+    </div>
+    <script src="js/reveal.js"></script>
+    <script>
+      Reveal.initialize({
+      width: '100%',
+      dependencies: [
+      { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }
+      ]
+      });
+    </script>
+  </body>
+</html>
