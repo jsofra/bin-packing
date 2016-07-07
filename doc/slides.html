@@ -695,6 +695,54 @@ https://creativecommons.org/publicdomain/mark/1.0/" style="font-size: .8em" href
           <section data-background="img/race.jpg">
             <h1>Results</h1>
           </section>
+          <section>
+            <div class="subheading">Results</div>
+            <div style="width:80%; margin:auto; text-align: center">
+              <div style="display: inline-block;">
+                <h3>Running tf-idf on Gutenberg bookshelves:</h3>
+                <div style="text-align: left; float: left; width:40%; float:left">
+                  <p>EMR Cluster:</p>
+                  <ul>
+                    <li>Master:</li>
+                    <ul><li>m3.xlarge</li></ul>
+                    <li>Core:</li>
+                    <ul><li>4 x m3.xlarge</li></ul>
+                    <li>CPUs:</li>
+                    <ul><li>20 total</li></ul>
+                    <li>Executors:</li>
+                    <ul><li>4 (one per core)</li></ul>
+                    <li>Workers:</li>
+                    <ul><li>16 (4 per executor)</li></ul>
+                  </ul>
+                </div>
+                <div style="text-align: left; float: right; width:60%; float:left">
+                  <p>Methods:</p>
+                  <ul>
+                    <li>Original <span style="color:red"><b>skewed</b></span> data</li>
+                    <ul><li>38 partitions</li></ul>
+                    <li>Maximally <span style="color:red"><b>partitioned</b></span> by number of bookshelves</li>
+                    <ul><li>228 partitions</li></ul>
+                    <li>Partitioned using <span style="color:red"><b>bin packing</b></span></li>
+                    <ul><li>16 partitions</li></ul>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+          <section>
+            <div class="subheading">Results</div>
+            <div style="width:80%; margin:auto">
+              <h3>Running times:</h3>
+              <ul>
+                <li><span style="color:red"><b>skewed</b></span></li>
+                <ul><li>~55 mins</li></ul>
+                <li><span style="color:red"><b>partitioned</b></span></li>
+                <ul><li>~25 mins</li></ul>
+                <li><span style="color:red"><b>bin packing</b></span></li>
+                <ul><li>15 mins</li></ul>
+              </ul>
+            </div>
+          </section>
         </section>
       </div>
     </div>
