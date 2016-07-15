@@ -3,7 +3,7 @@
             [bin-packing.spark-utils :as su]))
 
 (def stop-words #{"" "a" "all" "and" "any" "are" "is" "in" "of" "on"
-                  "or" "our" "so" "this" "the" "that" "to" "we"})
+                  "or" "our" "so" "this" "the" "that" "to" "we" "it" "for"})
 
 (defn split-words [s]
   (->> (string/split s #"\W+")
@@ -24,7 +24,7 @@
     (su/map-vals (partial calc-tf n-terms) (frequencies terms))))
 
 (defn term-doc-counts [id-and-terms]
-  (->> (su/mapcat (fn [[k v]] v) id-and-terms)
+  (->> (su/mapcat (fn [[k v]] (distinct v)) id-and-terms)
        (su/group-by identity)
        (su/map-vals count)))
 
