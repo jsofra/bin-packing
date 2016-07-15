@@ -115,15 +115,18 @@
           :size (apply + (map second urls))}]))
 
 (defn get-ebook-text [url]
-  (with-open [rdr (io/reader url)]
-    (apply str
-           (interpose " "
-                      (doall (->> (line-seq rdr)
-                                  (drop-while #(not-any? (partial string/starts-with? %)
-                                                         text-start-markers))
-                                  rest
-                                  (take-while #(not-any? (partial string/starts-with? %)
-                                                         text-end-markers))))))))
+  (try
+    (with-open [rdr (io/reader url)]
+      (apply str
+             (interpose " "
+                        (doall (->> (line-seq rdr)
+                                    (drop-while #(not-any? (partial string/starts-with? %)
+                                                           text-start-markers))
+                                    rest
+                                    (take-while #(not-any? (partial string/starts-with? %)
+                                                           text-end-markers)))))))
+    (catch Exception e (str "caught exception: " (.getMessage e)))
+    (finally "")))
 
 (defn get-ebook-texts [ebooks-urls]
   (update ebooks-urls :ebooks
