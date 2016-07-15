@@ -124,11 +124,11 @@
                                                  :ebook-urls-path ebook-urls-path)] ;"s3://silverpond/bin-packing-example/ebook_urls.txt"
     (spark/save-as-text-file (str "s3://silverpond/bin-packing-example/output/"
                                   output-file) ;books_tf_idf_packed.txt
-                             books-tf-idf)
+                             (su/map identity books-tf-idf))
     (when bookshelf-tf-idf
       (spark/save-as-text-file (str "s3://silverpond/bin-packing-example/output/bookself_"
                                     output-file)
-                               bookshelf-tf-idf))
+                               (su/map identity bookshelf-tf-idf)))
     ))
 
 ;; (set! *print-length* 16)
@@ -153,3 +153,16 @@
                                           bs-texts))
   ;; [#tuple[bookshelf-url text]]
   (def full-tf-idf (tf-idf/tf-idf bs-combined-text)))
+
+(comment
+  (def sc (make-local-spark-context))
+  (def results-rdd (->> "/home/jsofra/clojure-workspaces/bin-packing-resources/books_tf_idf.txt"
+                        (spark/text-file sc)
+                        (spark/map #(clojure.edn/read-string %))
+                        (su/map-vals (partial map
+                                              (fn [[k v]]
+                                                [(second k)
+                                                 (tf-idf/score-query "how to cook dinner for forty large human people"
+                                                                     v)])))))
+
+  )

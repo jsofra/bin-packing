@@ -1,4 +1,4 @@
-(defproject bin-packing "0.1.0-SNAPSHOT"
+(defproject bin-packing "0.3.0-SNAPSHOT"
   :description "FIXME: write description"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"

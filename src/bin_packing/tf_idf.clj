@@ -40,7 +40,10 @@
 
 (defn calc-tf-idf [{:keys [tfs idf]} & {:keys [sc]}]
   (let [idf-b (su/broadcast idf :sc sc)]
-    (su/map-vals #(merge-with * % (select-keys @idf-b (keys %)))
+    (su/map-vals #(->> (merge-with * % (select-keys @idf-b (keys %)))
+                       (sort-by second >)
+                       (take 500)
+                       (into {}))
                  tfs)))
 
 (defn tf-idf [id-doc-pairs]
