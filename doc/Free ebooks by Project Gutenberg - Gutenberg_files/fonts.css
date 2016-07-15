@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'UnifrakturCook';
+    src: url('unifrakturcook.eot'); /* IE8 */
+    src: local('UnifrakturCook'),
+         local('UnifrakturCook-Bold'),
+         url('unifrakturcook.woff2') format('woff2'),
+         url('unifrakturcook.woff') format('woff');
+    font-weight: 700;
+    font-style: normal;
+}
