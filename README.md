@@ -10,8 +10,11 @@ This repository contains the code for the bin-packing example.
 The code is written in Clojure.
 
 The main bin packing implementation can be seen at https://github.com/jsofra/bin-packing/blob/master/src/bin_packing/core.clj
+
 The tf-idf implementation can be seen at https://github.com/jsofra/bin-packing/blob/master/src/bin_packing/tf_idf.clj
+
 The implementation of the Spark custom partitioner can be seen at https://github.com/jsofra/bin-packing/blob/master/src/bin_packing/spark_example.clj#L29
+
 Some spark utilities to provide a unified interface over both Spark RDD's and Clojure data structures can be seen at https://github.com/jsofra/bin-packing/blob/master/src/bin_packing/spark_utils.clj
 
 
