@@ -48,38 +48,6 @@
   ([items n] (pack items (partial add-to-smallest-bin n)))
   ([items n max-size] (pack items (partial add-to-smallest-bin n) max-size)))
 
-(defn pack-n-bins-ish [items n]
-  (let [max-size (/ (reduce + (map second items)) (dec n))]
-    (pack items max-size)))
-
-(defn stich-bin-slices [bin-slices]
-  (apply map (fn [& items]
-               (let [items (filter identity items)]
-                 {:size (reduce + (map second items))
-                  :items items}))
-         bin-slices))
-
-(defn pack-n-bins-2
-  ([items n] (pack-n-bins-2 items n (second (first items))))
-  ([items n max-size]
-   (let [p-items (partition n n (repeat nil) items)
-         bin-slices (map-indexed (fn [idx i] (if (even? idx) i (reverse i)))
-                                 p-items)]
-     (stich-bin-slices bin-slices))))
-
-(defn pack-n-bins-3
-  ([items n] (pack-n-bins-3 items n (second (first items))))
-  ([items n max-size]
-   (let [bin-slices (->> (iterate (fn [[h t]]
-                                    [(conj h (take n t)) (reverse (drop n t))])
-                                  [[] items])
-                         (drop-while (fn [[h t]] (not (nil? (first t)))))
-                         ffirst)
-         bin-slices (conj (drop-last bin-slices)
-                          (concat (last bin-slices)
-                                  (repeat (rem n (count items)) nil)))]
-     (stich-bin-slices bin-slices))))
-
 (defn item-indices [bins]
   {:bin-count (count bins)
    :item-indices (into {}
