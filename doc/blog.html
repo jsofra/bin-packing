@@ -1,0 +1,371 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; }
+code > span.dt { color: #902000; }
+code > span.dv { color: #40a070; }
+code > span.bn { color: #40a070; }
+code > span.fl { color: #40a070; }
+code > span.ch { color: #4070a0; }
+code > span.st { color: #4070a0; }
+code > span.co { color: #60a0b0; font-style: italic; }
+code > span.ot { color: #007020; }
+code > span.al { color: #ff0000; font-weight: bold; }
+code > span.fu { color: #06287e; }
+code > span.er { color: #ff0000; font-weight: bold; }
+  </style>
+</head>
+<body>
+<h1 id="balancing-spark">Balancing Spark</h1>
+<p>On a recent client project with Silverpond I found myself working with some of our resident data scientists to do some large scale data analysis of electrical meter data. I was tasked with writing a harness for running a number of candidate models, written in Python, over all the meter data in an electricity network using <a href="http://spark.apache.org/docs/latest/api/python/index.html">PySpark</a>. PySpark is the <a href="https://www.python.org/">Python</a> API to <a href="http://spark.apache.org/docs/latest/index.html">Apache Spark</a>. We have been using Spark for scalable large batch processing jobs.</p>
+<p>I had not done a lot in this area previously so this project provided me with a crash course in distributed computing. Having tangled with this beast I came through the other side with my fair share of cuts and bruises. So am I now dusting myself off and am ready to share some lessons learned.</p>
+<p>All the example code for this blog post can be found on github at <a href="https://github.com/jsofra/bin-packing">https://github.com/jsofra/bin-packing</a>.</p>
+<h2 id="what-is-spark">What is Spark?</h2>
+<p>Spark is a general-purpose, distributed cluster computing engine. Here at Silverpond we love our <a href="https://en.wikipedia.org/wiki/Functional_programming">functional programming</a>, so much so that we are helping to run Melbourne's first functional programming conference, <a href="http://www.composeconference.org/">Compose</a>. Spark being written in <a href="www.scala-lang.org/">Scala</a> inherits some of Scala's functional flavour so right out of the box the API has a nice feel. This functional flavour is on display in Spark's central abstraction, the <a href="http://spark.apache.org/docs/latest/programming-guide.html#resilient-distributed-datasets-rdds">Resilient Distributed Datasets (RDD)</a>. RDD's are an immutable, partitioned, distributed data structure.</p>
+<div class="figure">
+<img src="blog_img/RDD.png" />
+</div>
+<p>All distributed computation in Spark is done via <strong>transformations</strong> and <strong>actions</strong> over the RDD's. Transformations are operations on RDD's that return a new transformed RDD, such as <em>map</em>, <em>filter</em>, <em>flatMap</em> etc. Actions are operations that run a computation on the RDD and return some value to the driver program, such as <em>reduce</em>, <em>count</em>, <em>take</em> etc.</p>
+<p>These operations should look familiar to anyone who has done some functional programming and they operate on the data as you may expect. The Spark magic happens in that the transformations will automatically be distributed in parallel across the cluster, whilst the actions may aggregate values and return a final result.</p>
+<h2 id="uneven-distribution">Uneven Distribution</h2>
+<p>An issue I ran into fairly early on in our adventures in Spark land was one of data skew. The first time I realised that there may be an issue with uneven distribution of computation on the cluster was when I was reviewing the <a href="http://ganglia.info/">Ganglia</a> metrics for my cluster (we were running <a href="https://aws.amazon.com/emr/">EMR</a> clusters) and noticed a strange pattern in the memory usage.</p>
+<div class="figure">
+<img src="blog_img/memory_data_skew.png" />
+</div>
+<p>As can be seen in the Ganglia memory trace above the memory usage ramps up quickly at the start of the job run and then experiences step changes in usage over time. As nodes in the cluster finish processing they release their memory and that is reflected in the trace. What we can see that one node seems to be processing data long after all the other nodes have finished processing. This is confirmed by looking at the load traces for the individual nodes (see below), we can see the fist node continues to have load after all the other have completed.</p>
+<p><img src="blog_img/node1_load.png" /> <img src="blog_img/node2_load.png" /> <img src="blog_img/node3_load.png" /> <img src="blog_img/node4_load.png" /></p>
+<p>It was clear from this that we had an uneven distribution of work across the cluster, one node was doing an unfair share of the work, whilst others did very little. This is obviously inefficient, there seems to be unused capacity in the cluster that we should be able to harness.</p>
+<p>Why the uneven distribution of work? Looking at my code it did not seem to be an algorithmic issue, the core of the code was simply mapping a function over each transformer in the the electrical network, Spark should do a good job of distributing that work. Spark partitions the data across the cluster and workers in each node are sent a mapping function (a task) to compute on their portion of the data. I decided to have a look at the Spark UI to see what is going on with those workers:</p>
+<iframe src="sparkui_skew.html#executor_metrics" height="500" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+
+<p>We can see that the tasks all take varying amounts of time to complete, which is what we expected. More interestingly we see in the aggregated metrics for the executors (JVM instances that workers run on) and the tasks list that all the executors and task have very varied input and output record sizes. So maybe it was the data? Each node is doing more or less work not because of computation complexity but because of the amount of data they are processing.</p>
+<p>Looking at my data I soon realised what was causing the problem. The meter readings we were running the models across were being grouped by transformer so as to run the model on a per transformer basis.</p>
+<div class="figure">
+<img src="blog_img/groupby.png" />
+</div>
+<p>It so happened that there is a wildly varying number of meters per transformer, hence the differing amount of data each task was having to process. We have a data skew problem arising from the natural hierarchy in our data!</p>
+<h2 id="project-gutenberg-data-skew-example">Project Gutenberg Data Skew Example</h2>
+<p>In the rest of this post I will outline one technique I used to addressed our data skew issue. I will provide a small example problem and solution that is more easily digestible than the model that we were running on the electrical network.</p>
+<p>The example makes use of the text of ebooks in the <a href="https://www.gutenberg.org/">Project Gutenberg</a> collection. The ebooks are grouped using the <a href="https://www.gutenberg.org/w/index.php?title=Category:Bookshelf">Gutenberg Bookshelves</a> (bookshelves are categories e.g. Adventure, Sci-Fi, Reglious Texts etc) and frequency analysis is performed on these groups. In this way we are able produce a natural data skew since there is a wide variance in the number and size of the texts in each bookshelf.</p>
+<p>The Frequency analysis used is a very vanilla <a href="https://en.wikipedia.org/wiki/Tf%E2%80%93idf">Term Frequency - Inverse Document Frequency (TF-IDF)</a> model.</p>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({ TeX: { extensions: ["color.js"] },
+                     tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]}});
+</script>
+<div style="font-size: 200%;">
+<br /><span class="math">$${\color{crimson}W}_{{\color{mediumseagreen}term}, {\color{cornflowerblue}doc}}={\color{darkorange}tf}_{{\color{mediumseagreen}term}, {\color{cornflowerblue}doc}}\times log(\frac{\color{deeppink}N}{{\color{darkmagenta}df}_{{\color{mediumseagreen}term}}})$$</span><br />
+</div>
+<div style="text-align: left; width: 50%; margin: 0 auto;">
+<span class="math">${\color{crimson}W}_{{\color{mediumseagreen}term}, {\color{cornflowerblue}doc}}$</span> = weight of <span class="math">$_{{\color{mediumseagreen}term}}$</span> in <span class="math">$_{{\color{cornflowerblue}doc}}$</span> <br> <span class="math">${\color{darkorange}tf}_{{\color{mediumseagreen}term}, {\color{cornflowerblue}doc}}$</span> = frequency of <span class="math">$_{{\color{mediumseagreen}term}}$</span> in <span class="math">$_{{\color{cornflowerblue}doc}}$</span> <br> <span class="math">${\color{darkmagenta}df}_{{\color{mediumseagreen}term}}$</span> = number of documents containing <span class="math">$_{{\color{mediumseagreen}term}}$</span> <br> <span class="math">${\color{deeppink}N}$</span> = total number of documents
+</div>
+<p><br></p>
+<p>The intention is to be able to search the Gutenberg texts in a couple of ways, given some search terms:</p>
+<ol style="list-style-type: decimal">
+<li>Find the text in each Gutenberg bookshelf that those terms are most important to.</li>
+<li>Find the Gutenberg bookshelf that those terms are most important to.</li>
+</ol>
+<p>The code in the example is all written in <a href="http://clojure.org/">Clojure</a> using the <a href="http://gorillalabs.github.io/sparkling/">Sparking</a> library, a Clojure API for Spark, but should be easily translated to any other language with Spark support. Clojure turns out to be a great way to work with Spark, it is functionally focused, has a great REPL for interactive development and being on the JVM means much nicer deployment story than Python.</p>
+<h2 id="fixing-the-skew">Fixing the Skew</h2>
+<p>So what to do about data skew? Looking at data in each of out partitions we know that we have some heavily weighted partitions with a number of the larger bookshelves clumped together. We know that Spark assigns one task per partition and each worker can process only one task at a time. This means the more partitions the greater potential parallelism, given enough hardware to support it.</p>
+<div class="figure">
+<img src="blog_img/rdd_partitions.png" />
+</div>
+<h3 id="simply-partitioning">Simply Partitioning</h3>
+<p>So can we simply partition are way out of this? What if we simply partition our data to the number of units of work we have? In our case we are preforming the TF-IDF over each book shelf so we can partition the data by the number of book shelves, 228. That means there will be 228 tasks to be performed in parallel.</p>
+<pre class="sourceCode clojure"><code class="sourceCode clojure">(spark/repartition <span class="dv">228</span> bookshelves)</code></pre>
+<p>Let's have a look at the Spark UI for using this repartitioning and see how it compares to the previous skewed example:</p>
+<iframe src="partitioning3.html#viz" height="500" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+
+<p>The partitioning did in fact improve the performance greatly, we went from ~55 mins to ~25 mins on the same hardware, but there are still a number of issues here:</p>
+<ul>
+<li>
+Overhead from small tasks
+<ul>
+<li>
+We can see a number of very small tasks, there is significant overhead in each Spark task.
+</li>
+</ul>
+</li>
+<li>
+Poor scheduling
+<ul>
+<li>
+Since we have less workers than tasks, task will be scheduled across workers in the cluster. At the end of the run we can see a number of very large tasks have run, this is inefficient since a better scheduling would allow for a number a smaller tasks to be run in parallel to the larger tasks. As it stands we may still have unused capacity in the cluster.
+</li>
+</ul>
+</li>
+<li>
+Not enough hardware
+<ul>
+<li>
+If we had more hardware we could increase the parallelism, more workers to process the tasks.
+</li>
+</ul>
+</li>
+<li>
+Uneven distribution
+<ul>
+<li>
+Looking at the executor metrics we can still see significant imbalance in the records output size across the cluster.
+</li>
+</ul>
+</li>
+</ul>
+
+<h3 id="packing-problems">Packing Problems</h3>
+<p>The problem seems to be that Spark does not have enough information about the shape of our data to know how to best schedule the tasks. Spark allows use to use our own custom partitioning scheme, could we create more balanced computation across the workers be partitioning the data into more evenly weighted chunks? This would mean we were less reliant on Sparks scheduling of the tasks.</p>
+<p>The problem roughly falls into a class of optimization problems known as <a href="https://en.wikipedia.org/wiki/Packing_problems">packing problems</a>. These are NP-hard problems so we will need to make use of some kind of heuristical method when implementing a solution.</p>
+<h4 id="bin-packing">Bin-packing</h4>
+<p>Our problem seems most closely related to the <a href="https://en.wikipedia.org/wiki/Bin_packing_problem">Bin Packing</a> problem (minimum number of bins of a certain volume) or maybe the <a href="https://en.wikipedia.org/wiki/Multiprocessor_scheduling">Multiprocessor Scheduling</a> problem (pack into a specific number of bins). We will look at two Bin Packing methods:</p>
+<ol style="list-style-type: decimal">
+<li>First Fit (smallest number of fixed sized bins)</li>
+<li>First Fit + Smallest Bin (fixed number of bins)</li>
+</ol>
+<p><em>Note:</em> that these methods were chosen for their ease of implementation, the actual methods are however somewhat orthogonal to solving this partitioning problem in Spark we just need a way to create even partitions. Note also that these methods require the items being packed to be sorted in descending order based on the weight given to each item. This may be prohibitive for certain application if it requires shuffling of data around the cluster. In this case we use the number of books in a bookshelf as out weight and are using the urls to the books as our data so it is inexpensive to calculate.</p>
+<p>Let's look at he implementations for those two methods. First we will define some helper functions to add an item to a bin, select the a bin that an item fits into and add a new bin:</p>
+<pre class="sourceCode clojure"><code class="sourceCode clojure">
+(<span class="kw">defn</span><span class="fu"> add-to-bin </span>[bin [_ size <span class="kw">:as</span> item]]
+  <span class="st">&quot;Add an item to a bin.&quot;</span>
+  {<span class="kw">:size</span> (<span class="kw">+</span> (<span class="kw">:size</span> bin) size)
+   <span class="kw">:items</span> (<span class="kw">conj</span> (<span class="kw">:items</span> bin) item)})
+
+(<span class="kw">defn</span><span class="fu"> select-bin </span>[bins [_ size] max-size]
+  <span class="st">&quot;Select the first bin that the item fits into.&quot;</span>
+  (<span class="kw">letfn</span> [(fits? [bin]
+            (<span class="kw">let</span> [new-size (<span class="kw">+</span> (<span class="kw">:size</span> bin) size)]
+              (<span class="kw">&lt;=</span> new-size max-size)))]
+    (<span class="kw">-&gt;</span> (keep-indexed (<span class="kw">fn</span> [i b] (<span class="kw">when</span> (fits? b) i)) bins)
+        <span class="kw">first</span>)))
+
+(<span class="kw">defn</span><span class="fu"> grow-bins </span>[bins item]
+  <span class="st">&quot;Grow the number of bins by one.&quot;</span>
+  (<span class="kw">conj</span> bins (add-to-bin {<span class="kw">:size</span> <span class="dv">0</span> <span class="kw">:items</span> []} item)))</code></pre>
+<h4 id="first-fit-packing">First Fit Packing</h4>
+<p>With first fit packing we aim to create the smallest number of bins of a fixed size that the items fit into. We do that by iteratively placing items into the first bin that the item will fit into until there are no items left, like thus:</p>
+<ol>
+<li>
+start with a single empty bin
+</li>
+<ul><li>
+maybe the size of the largest item
+</li></ul>
+<li>
+for each item find the first bin that it will fit into and place it into the bin
+</li>
+<li>
+if no bins will fit the item create a new bin to put it into to
+</li>
+<li>
+continue until all items are exhausted
+</li>
+</ol>
+
+<p>The code below shows this implemented in Clojure using a reduce over all the items, accumulating a list of bin, either fitting each item into an existing bin or creating a new bin.</p>
+<pre class="sourceCode clojure"><code class="sourceCode clojure">
+(<span class="kw">defn</span><span class="fu"> first-fit-pack</span>
+  <span class="st">&quot;Simple first fit algorithm that grows bins once reaching max-size.</span>
+<span class="st">   Should give min required bins.&quot;</span>
+  [items max-size]
+  (<span class="kw">let</span> [init-bins [{<span class="kw">:size</span> <span class="dv">0</span> <span class="kw">:items</span> []}]]
+    (<span class="kw">reduce</span> (<span class="kw">fn</span> [bins item]
+              (<span class="kw">if-let</span> [fit (select-bin bins item max-size)]
+                (<span class="kw">update-in</span> bins [fit] #(add-to-bin % item))
+                (grow-bins bins item)))
+            init-bins items)))
+
+(<span class="kw">let</span> [items [[<span class="kw">:a</span> <span class="dv">9</span>] [<span class="kw">:b</span> <span class="dv">7</span>] [<span class="kw">:c</span> <span class="dv">6</span>] [<span class="kw">:d</span> <span class="dv">5</span>] [<span class="kw">:e</span> <span class="dv">5</span>] [<span class="kw">:f</span> <span class="dv">4</span>] [<span class="kw">:g</span> <span class="dv">3</span>] [<span class="kw">:h</span> <span class="dv">2</span>] [<span class="kw">:i</span> <span class="dv">1</span>]]]
+  (<span class="kw">assert</span>
+   (<span class="kw">=</span> (first-fit-pack items <span class="dv">9</span>)
+      [{<span class="kw">:size</span> <span class="dv">9</span> <span class="kw">:items</span> [[<span class="kw">:a</span> <span class="dv">9</span>]]}
+       {<span class="kw">:size</span> <span class="dv">9</span> <span class="kw">:items</span> [[<span class="kw">:b</span> <span class="dv">7</span>] [<span class="kw">:h</span> <span class="dv">2</span>]]}
+       {<span class="kw">:size</span> <span class="dv">9</span> <span class="kw">:items</span> [[<span class="kw">:c</span> <span class="dv">6</span>] [<span class="kw">:g</span> <span class="dv">3</span>]]}
+       {<span class="kw">:size</span> <span class="dv">9</span> <span class="kw">:items</span> [[<span class="kw">:d</span> <span class="dv">5</span>] [<span class="kw">:f</span> <span class="dv">4</span>]]}
+       {<span class="kw">:size</span> <span class="dv">6</span> <span class="kw">:items</span> [[<span class="kw">:e</span> <span class="dv">5</span>] [<span class="kw">:i</span> <span class="dv">1</span>]]}])))</code></pre>
+<h4 id="first-fit-smallest-bin-packing">First Fit + Smallest Bin Packing</h4>
+<p>First fit works pretty well but to optimise for the particular hardware we are using (in a hardware constrained environment) it would be good to have a fixed number of bins instead of a fixed bin size. In this way if we have 16 workers we can create 16 evenly sized bins, one for each worker to process.</p>
+<p>To achieve this I have slightly modified the first fit process above so that instead of growing the number of bins when we have an item that will not fit we find the bin with the smallest number of items in it and we add the item to it. Thus once all the bins are 'full' the rest of the items will simply get distributed one by one to the smallest bin at the time. This only works because we are using a sorted list of items. The process is as thus:</p>
+<ol>
+<li>
+start with a single empty bin
+</li>
+<ul><li>
+maybe the size of the largest item
+</li></ul>
+<li>
+for each item find the first bin that it will fit into and place it into the bin
+</li>
+<li>
+if no bins will fit the item add it too the bin that has the least in it
+</li>
+<li>
+continue until all items are exhausted
+</li>
+</ol>
+
+<p>The code below shows this implemented in Clojure, again using a reduce over all the items but this time replacing the <strong>grow-bin</strong> function with the <strong>add-to-smallest-bin</strong> function.</p>
+<pre class="sourceCode clojure"><code class="sourceCode clojure">
+(<span class="kw">defn</span><span class="fu"> add-to-smallest-bin </span>[n bins item]
+  <span class="st">&quot;Add the item to the smallest bin.&quot;</span>
+  (<span class="kw">if</span> (<span class="kw">&lt;</span> (<span class="kw">count</span> bins) n)
+    (grow-bins bins item)
+    (<span class="kw">update-in</span> bins [(select-smallest-bin bins)]
+               #(add-to-bin % item))))
+
+(<span class="kw">defn</span><span class="fu"> first-fit-smallest-bin-pack</span>
+  <span class="st">&quot;Simple first fit algorithm that continues to add to the smallest bin</span>
+<span class="st">   once n bins have been filled to max-size.&quot;</span>
+  [items n max-size]
+  (<span class="kw">let</span> [init-bins [{<span class="kw">:size</span> <span class="dv">0</span> <span class="kw">:items</span> []}]]
+    (<span class="kw">reduce</span> (<span class="kw">fn</span> [bins item]
+              (<span class="kw">if-let</span> [fit (select-bin bins item max-size)]
+                (<span class="kw">update-in</span> bins [fit] #(add-to-bin % item))
+                (add-to-smallest-bin n bins item)))
+            init-bins items)))
+
+(<span class="kw">let</span> [items [[<span class="kw">:a</span> <span class="dv">9</span>] [<span class="kw">:b</span> <span class="dv">7</span>] [<span class="kw">:c</span> <span class="dv">6</span>] [<span class="kw">:d</span> <span class="dv">5</span>] [<span class="kw">:e</span> <span class="dv">5</span>] [<span class="kw">:f</span> <span class="dv">4</span>] [<span class="kw">:g</span> <span class="dv">3</span>] [<span class="kw">:h</span> <span class="dv">2</span>] [<span class="kw">:i</span> <span class="dv">1</span>]]]
+  (<span class="kw">assert</span>
+   (<span class="kw">=</span> (first-fit-smallest-bin-pack items <span class="dv">3</span> <span class="dv">9</span>)
+      [{<span class="kw">:size</span> <span class="dv">14</span> <span class="kw">:items</span> [[<span class="kw">:a</span> <span class="dv">9</span>] [<span class="kw">:f</span> <span class="dv">4</span>] [<span class="kw">:i</span> <span class="dv">1</span>]]}
+       {<span class="kw">:size</span> <span class="dv">14</span> <span class="kw">:items</span> [[<span class="kw">:b</span> <span class="dv">7</span>] [<span class="kw">:e</span> <span class="dv">5</span>] [<span class="kw">:h</span> <span class="dv">2</span>]]}
+       {<span class="kw">:size</span> <span class="dv">14</span> <span class="kw">:items</span> [[<span class="kw">:c</span> <span class="dv">6</span>] [<span class="kw">:d</span> <span class="dv">5</span>] [<span class="kw">:g</span> <span class="dv">3</span>]]}])))</code></pre>
+<h3 id="spark-custom-partitioning">Spark Custom Partitioning</h3>
+<p>Spark allows for custom partitioning of data across the cluster by providing an implementation of the <a href="https://spark.apache.org/docs/1.6.1/api/java/org/apache/spark/Partitioner.html"><strong>Partitioner</strong></a> class.You can only partition RDD's of key-value pairs, this a special RDD in Spark where each item is a pair with both key and a value. Two abstract method of the <strong>Partitioner</strong> class must be implemented to describe the partitioning scheme, <strong>getPartition</strong> and <strong>numPartitions</strong>. The <strong>numPartitions</strong> method simply controls the number of partitions you wish to create (returning an integer), whereas <strong>getPartition</strong> does the work of mapping a key (from the key value pair) to a partition index (returning an integer). So for our partitioning scheme we would like to map an item key (url of bookshelf) to an index for a bin.</p>
+<p>Let's look at the code for creating these indices:</p>
+<pre class="sourceCode clojure"><code class="sourceCode clojure">
+(<span class="kw">defn</span><span class="fu"> item-indices </span>[bins]
+  {<span class="kw">:bin-count</span> (<span class="kw">count</span> bins)
+   <span class="kw">:item-indices</span> (<span class="kw">into</span> {}
+                       (<span class="kw">for</span> [[idx bin] (map-indexed <span class="kw">vector</span> bins)
+                             [k _] (<span class="kw">:items</span> bin)]
+                         [k idx]))})
+
+(<span class="kw">let</span> [items [[<span class="kw">:a</span> <span class="dv">9</span>] [<span class="kw">:b</span> <span class="dv">7</span>] [<span class="kw">:c</span> <span class="dv">6</span>] [<span class="kw">:d</span> <span class="dv">5</span>] [<span class="kw">:e</span> <span class="dv">5</span>] [<span class="kw">:f</span> <span class="dv">4</span>] [<span class="kw">:g</span> <span class="dv">3</span>] [<span class="kw">:h</span> <span class="dv">2</span>] [<span class="kw">:i</span> <span class="dv">1</span>]]]
+  (<span class="kw">assert</span>
+   (<span class="kw">=</span> (<span class="kw">-&gt;</span> items
+          (bin-packing/first-fit-smallest-bin-pack items <span class="dv">9</span> <span class="dv">3</span>)
+          bin-packing/item-indices)
+          {<span class="kw">:bin-count</span> <span class="dv">3</span>
+           <span class="kw">:item-indices</span> {<span class="kw">:e</span> <span class="dv">1</span> <span class="kw">:g</span> <span class="dv">2</span> <span class="kw">:c</span> <span class="dv">2</span> <span class="kw">:h</span> <span class="dv">1</span> <span class="kw">:b</span> <span class="dv">1</span> <span class="kw">:d</span> <span class="dv">2</span> <span class="kw">:f</span> <span class="dv">0</span> <span class="kw">:i</span> <span class="dv">0</span> <span class="kw">:a</span> <span class="dv">0</span>}})))</code></pre>
+<p>Ok so we now have a map of item keys to bin indices, <strong>item-indices</strong> and a count of the number of bins, <strong>bin-count</strong>, all we need to do now is create a <strong>Partitioner</strong> implementation and we can repartition our data. To create the <strong>Partitioner</strong> in Clojure we can use <strong>proxy</strong> to create an anonymous implementation of the abstract class. Maps, such at <strong>item-indices</strong> act as functions that take a key and return a value, thus to implement <strong>getPartition</strong> it can simply be passed the map and apply the key to it, whilst we return <strong>bin-count</strong> from <strong>numPartitions</strong> and we are done.</p>
+<p>A complete bin packing repartitioning may look something like this:</p>
+<pre class="sourceCode clojure"><code class="sourceCode clojure">
+(<span class="kw">defn</span><span class="fu"> partitioner-fn </span>[{<span class="kw">:keys</span> [bin-count item-indices]}]
+  (su/log <span class="st">&quot;Partitioning into&quot;</span> bin-count <span class="st">&quot;partitions.&quot;</span>)
+  (<span class="kw">proxy</span> [Partitioner] []
+    <span class="co">;; get partition index</span>
+    (getPartition [<span class="kw">key</span>] (item-indices <span class="kw">key</span>))
+    (numPartitions [] bin-count)))
+
+(<span class="kw">defn</span><span class="fu"> partition-into-bins </span>[ebook-urls weight-fn]
+  (<span class="kw">let</span> [ebook-urls    (spark/cache ebook-urls)
+        packing-items (spark/collect
+                       (su/map (<span class="kw">fn</span> [[k v]] [k (weight-fn v)])
+                               ebook-urls))
+        indices       (<span class="kw">-&gt;</span> (<span class="kw">sort-by</span> <span class="kw">second</span> <span class="kw">&gt;</span> packing-items)
+                          (bin-packing/first-fit-smallest-bin-pack <span class="dv">16</span>)
+                          bin-packing/item-indices)]
+    (spark/partition-by
+     (partitioner-fn indices)
+     ebook-urls)))</code></pre>
+<h2 id="results">Results</h2>
+<p>So how well did the bin packing scheme work on our Gutenberg dataset?</p>
+<p>I ran the TF-IDF over the Gutenberg bookshelves on an <a href="https://aws.amazon.com/emr/">EMR</a> cluster with the follow configuration:</p>
+<ul>
+<li>
+Master:
+</li>
+<ul><li>
+m3.xlarge
+</li></ul>
+<li>
+Core:
+</li>
+<ul><li>
+4 x m3.xlarge
+</li></ul>
+<li>
+CPUs:
+</li>
+<ul><li>
+20 total
+</li></ul>
+<li>
+Executors:
+</li>
+<ul><li>
+4 (one per core)
+</li></ul>
+<li>
+Workers:
+</li>
+<ul><li>
+16 (4 per executor)
+</li></ul>
+</ul>
+
+<p>On this EMR cluster I applied the TF-IDF algorithm using 3 different methods:</p>
+<ul>
+<li>
+<span style="color:red"><b>Skewed</b></span> S3 data, without re-partitioning
+</li>
+<ul><li>
+38 partitions
+</li></ul>
+    <li>
+<span style="color:red"><b>Re-partitioned</b></span> data, maximally partitioned by number of bookshelves
+</li>
+<ul><li>
+228 partitions
+</li></ul>
+<li>
+<span style="color:red"><b>Bin packed</b></span> data, re-partitioned using bin packing method
+</li>
+<ul><li>
+16 partitions
+</li></ul>
+</ul>
+
+<p>Using these three methods we got run times as follows:</p>
+<ul>
+<li>
+<span style="color:red"><b>Skewed</b></span>
+</li>
+<ul><li>
+~55 mins
+</li></ul>
+<li>
+<span style="color:red"><b>Re-partitioned</b></span>
+</li>
+<ul><li>
+~25 mins
+</li></ul>
+<li>
+<span style="color:red"><b>Bin packed</b></span>
+</li>
+<ul><li>
+15 mins
+</li></ul>
+</ul>
+
+<p>This shows a significant improvement using maximal partitioning bin on the Gutenberg data set and an even greater improvement using the bin packing method. The bin packing method is also has the most predictable run time (it was always 15 mins), where as the other fluctuated due to the unpredictability of the scheduling of the tasks of different sizes. If we look at the Spark UI for a bin packed run we can see just how evenly the tasks were distributed:</p>
+<iframe src="bin_packed.html" height="500" width="100%" style="overflow-x:hidden; overflow-y:scroll;"></iframe>
+
+<h2 id="conclusions">Conclusions</h2>
+<p>Data skew in a distributed computation has the potential to cause massive inefficiencies. It is really important to consider how your data is partitioned across the cluster. You should aim to avoid shuffling of data around nodes in the cluster but under circumstances where you are suffering data skew it may be more efficient to repartition your data, prior to performing you computation, to allow it to more evenly distributed across the cluster and to gain more parallelism.</p>
+<p>In limited resource environments bin packing can beat out simple partitioning and is quite straight forward to implement. Bin packing can also help save on the the amount of resources needed to run your computation, more optimally making use of the capacity of you cluster, therefore allowing you to use a smaller cluster. Bin packing may also make the run time of a computation a little more predictable, Spark with not predictable schedule the same set of tasks to unevenly sized task tend to cause more variance in the over all run time.</p>
+</body>
+</html>
